@@ -16,7 +16,7 @@ struct LinearSpringEnergyFunctor {
     double* locYAddr;
     double* locZAddr;
 
-    unsigned* idKey;
+    int* idKey;
     
 	__host__ __device__ LinearSpringEnergyFunctor(
         double& _spring_constant,
@@ -24,7 +24,7 @@ struct LinearSpringEnergyFunctor {
         double* _locYAddr,
         double* _locZAddr,
         
-        unsigned* _idKey
+        int* _idKey
         ) :
         spring_constant(_spring_constant),
         locXAddr(_locXAddr),
@@ -36,11 +36,11 @@ struct LinearSpringEnergyFunctor {
 	__device__ double operator()(const Tuuud &u3d) {
         		
         //counter ranges from 0 to num_edges. 
-        unsigned counter = thrust::get<0>(u3d);
-		unsigned place = 2 * counter;//represents location in write to vector.
+        int counter = thrust::get<0>(u3d);
+		int place = 2 * counter;//represents location in write to vector.
 
-        unsigned edgeL = thrust::get<1>(u3d);
-        unsigned edgeR = thrust::get<2>(u3d);
+        int edgeL = thrust::get<1>(u3d);
+        int edgeR = thrust::get<2>(u3d);
         double length_zero = thrust::get<3>(u3d);
 
         // compute forces.

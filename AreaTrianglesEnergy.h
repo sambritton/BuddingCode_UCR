@@ -16,7 +16,7 @@ struct AreaEnergyFunctor {
     double* locYAddr;
     double* locZAddr;
 
-    unsigned* idKey;
+    int* idKey;
     
 	__host__ __device__ AreaEnergyFunctor(
         double& _area_0,
@@ -24,7 +24,7 @@ struct AreaEnergyFunctor {
         double* _locXAddr,
         double* _locYAddr,
         double* _locZAddr,
-        unsigned* _idKey):
+        int* _idKey):
         area_0(_area_0),
         spring_constant(_spring_constant),
         locXAddr(_locXAddr),
@@ -35,12 +35,12 @@ struct AreaEnergyFunctor {
 	//hand in counting iterator and id of triangle
 	__device__ double operator()(const Tuuuu &u4) {
         //test placing the ids of the nodes and then get positions. 
-		unsigned counter = thrust::get<0>(u4);
-		unsigned place = 3 * counter;//represents location in write to vector.
+		int counter = thrust::get<0>(u4);
+		int place = 3 * counter;//represents location in write to vector.
 
-        unsigned id_i = thrust::get<1>(u4);
-        unsigned id_j = thrust::get<2>(u4);
-        unsigned id_k = thrust::get<3>(u4);
+        int id_i = thrust::get<1>(u4);
+        int id_j = thrust::get<2>(u4);
+        int id_k = thrust::get<3>(u4);
 
 		
 		CVec3 ri = thrust::make_tuple<double>(locXAddr[id_i], locYAddr[id_i], locZAddr[id_i]);

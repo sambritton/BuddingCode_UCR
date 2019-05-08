@@ -16,11 +16,11 @@ struct CosBendingEnergyFunctor {
     double* locYAddr;
     double* locZAddr;
 
-    unsigned* idKey;
+    int* idKey;
 
-	unsigned* triangle2Nodes_1Addr;
-	unsigned* triangle2Nodes_2Addr;
-	unsigned* triangle2Nodes_3Addr;
+	int* triangle2Nodes_1Addr;
+	int* triangle2Nodes_2Addr;
+	int* triangle2Nodes_3Addr;
 
 	__host__ __device__ CosBendingEnergyFunctor(
 		double& _spring_constant,
@@ -29,11 +29,11 @@ struct CosBendingEnergyFunctor {
 		double* _locYAddr,
 		double* _locZAddr,
 
-		unsigned* _idKey,
+		int* _idKey,
 
-		unsigned* _triangle2Nodes_1Addr,
-		unsigned* _triangle2Nodes_2Addr,
-		unsigned* _triangle2Nodes_3Addr) :
+		int* _triangle2Nodes_1Addr,
+		int* _triangle2Nodes_2Addr,
+		int* _triangle2Nodes_3Addr) :
 		
 
 
@@ -52,26 +52,26 @@ struct CosBendingEnergyFunctor {
 	//hand in counting iterator and id's of two triangles, and two nodes involved. 
 	__device__ double operator()(const Tuuuuu &u5) {
 		double energy = 0.0;
-		unsigned counter = thrust::get<0>(u5);
-		unsigned place = 4 * counter;//represents location in write to vector.
+		int counter = thrust::get<0>(u5);
+		int place = 4 * counter;//represents location in write to vector.
 
-		unsigned id_l, id_j;
+		int id_l, id_j;
 		//Id's of elements on sides of a given edge
 		//these are the same if we are at the edge of the membrane, so do not compute those.
-		unsigned T1 = thrust::get<1>(u5);
-		unsigned T2 = thrust::get<2>(u5);
+		int T1 = thrust::get<1>(u5);
+		int T2 = thrust::get<2>(u5);
 
 		//these id's are accurate
-		unsigned id_k = thrust::get<3>(u5);
-		unsigned id_i = thrust::get<4>(u5);
+		int id_k = thrust::get<3>(u5);
+		int id_i = thrust::get<4>(u5);
 		if (T1 != T2) {
 			//we need to compute rl and rj from the two involved triangles. 
 
 			//j is from the element on edge2elem_1
 			//l is from the element node in edge2elem_1, not i or k
-			unsigned n1T1 = triangle2Nodes_1Addr[T1];
-			unsigned n2T1 = triangle2Nodes_2Addr[T1];
-			unsigned n3T1 = triangle2Nodes_3Addr[T1];
+			int n1T1 = triangle2Nodes_1Addr[T1];
+			int n2T1 = triangle2Nodes_2Addr[T1];
+			int n3T1 = triangle2Nodes_3Addr[T1];
 			if ((n1T1 != id_i) && (n1T1 != id_k)) {
 				id_j = n1T1;
 			}
@@ -86,9 +86,9 @@ struct CosBendingEnergyFunctor {
 
 			//l is from the element node in edge2elem_2, not i or k
 			//one of these is l, find it
-			unsigned n1T2 = triangle2Nodes_1Addr[T2];
-			unsigned n2T2 = triangle2Nodes_2Addr[T2];
-			unsigned n3T2 = triangle2Nodes_3Addr[T2];
+			int n1T2 = triangle2Nodes_1Addr[T2];
+			int n2T2 = triangle2Nodes_2Addr[T2];
+			int n3T2 = triangle2Nodes_3Addr[T2];
 			if ((n1T2 != id_i) && (n1T2 != id_k)) {
 				id_l = n1T2;
 			}

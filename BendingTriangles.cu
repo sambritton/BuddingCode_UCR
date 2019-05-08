@@ -9,7 +9,7 @@ void ComputeCosTriangleSprings(
     BendingTriangleInfoVecs& bendingTriangleInfoVecs) {
 	
     
-    thrust::counting_iterator<unsigned> elemId(0); 
+    thrust::counting_iterator<int> elemId(0); 
 
 	//bendingTriangleInfoVecs.initial_angle = 1.5707963267/2.0;
 	thrust::fill(bendingTriangleInfoVecs.tempNodeForceXReduced.begin(),bendingTriangleInfoVecs.tempNodeForceXReduced.end(),0.0);
@@ -35,9 +35,11 @@ void ComputeCosTriangleSprings(
                 coordInfoVecs.edges2Triangles_1.begin(),
                 coordInfoVecs.edges2Triangles_2.begin(),
                 coordInfoVecs.edges2Nodes_1.begin(),
-                coordInfoVecs.edges2Nodes_2.begin())) + coordInfoVecs.num_edges,
+                coordInfoVecs.edges2Nodes_2.begin())) + generalParams.num_of_edges,//coordInfoVecs.num_edges,
         CosBendingFunctor(
             bendingTriangleInfoVecs.spring_constant,
+            bendingTriangleInfoVecs.spring_constant_weak,
+            thrust::raw_pointer_cast(generalParams.edges_in_upperhem.data()),
             bendingTriangleInfoVecs.initial_angle,        
             thrust::raw_pointer_cast(coordInfoVecs.nodeLocX.data()),
             thrust::raw_pointer_cast(coordInfoVecs.nodeLocY.data()),
@@ -52,7 +54,7 @@ void ComputeCosTriangleSprings(
             thrust::raw_pointer_cast(coordInfoVecs.triangles2Nodes_3.data())),
 		0.0, thrust::plus<double>() );
 	
-/*	for (unsigned i = 0; i < bendingTriangleInfoVecs.tempNodeIdUnreduced.size(); i++) {
+/*	for (int i = 0; i < bendingTriangleInfoVecs.tempNodeIdUnreduced.size(); i++) {
 
 		std::cout<<"id: "<< bendingTriangleInfoVecs.tempNodeIdUnreduced[i]<<std::endl;
 		std::cout<< "unreduced F_x: "<< bendingTriangleInfoVecs.tempNodeForceXUnreduced[i]<<std::endl;
@@ -66,9 +68,9 @@ void ComputeCosTriangleSprings(
             thrust::make_tuple(
                 bendingTriangleInfoVecs.tempNodeForceXUnreduced.begin(),
                 bendingTriangleInfoVecs.tempNodeForceYUnreduced.begin(),
-                bendingTriangleInfoVecs.tempNodeForceZUnreduced.begin())), thrust::less<unsigned>());
+                bendingTriangleInfoVecs.tempNodeForceZUnreduced.begin())), thrust::less<int>());
     
-    unsigned endKey = thrust::get<0>(
+    int endKey = thrust::get<0>(
         thrust::reduce_by_key(
             bendingTriangleInfoVecs.tempNodeIdUnreduced.begin(), 
             bendingTriangleInfoVecs.tempNodeIdUnreduced.end(),
@@ -84,9 +86,9 @@ void ComputeCosTriangleSprings(
                 bendingTriangleInfoVecs.tempNodeForceXReduced.begin(),
                 bendingTriangleInfoVecs.tempNodeForceYReduced.begin(),
                 bendingTriangleInfoVecs.tempNodeForceZReduced.begin())),
-		thrust::equal_to<unsigned>(), CVec3Add())) - bendingTriangleInfoVecs.tempNodeIdReduced.begin();//binary_pred, binary_op 
+		thrust::equal_to<int>(), CVec3Add())) - bendingTriangleInfoVecs.tempNodeIdReduced.begin();//binary_pred, binary_op 
 		
-    /*	for (unsigned i = 0; i < bendingTriangleInfoVecs.tempNodeIdReduced.size(); i++) {
+    /*	for (int i = 0; i < bendingTriangleInfoVecs.tempNodeIdReduced.size(); i++) {
 
 			std::cout<<"id: "<< bendingTriangleInfoVecs.tempNodeIdReduced[i]<<std::endl;
 			std::cout<< "reduced F_x: "<< bendingTriangleInfoVecs.tempNodeForceXReduced[i]<<std::endl;

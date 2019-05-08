@@ -11,8 +11,8 @@ current_dir := $(shell pwd)
 LIBS:=  -lpugixml -L/$(current_dir)/pugixml/lib64
 #-lgsl -lgslcblas
 
-ILIBS_cuda8 = -I/opt/linux/centos/7.x/x86_64/pkgs/cuda/8.0/include/
-ILIBS_cuda9 := -I/opt/linux/centos/7.x/x86_64/pkgs/cuda/9.1/include/
+ILIBSCPP := -I/afs/crc.nd.edu/x86_64_linux/c/cuda/8.0/include/
+ILIBS1 := -I/afs/crc.nd.edu/x86_64_linux/c/cuda/9.2/include/
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
@@ -21,11 +21,13 @@ CPP_SRCS += \
 ../MemRepulsionSprings.cu\
 ../LinearSprings.cu \
 ../LJSprings.cu \
+../LJSprings_LJ.cu \
+../VolumeComp.cu \
+../VolumeSprings.cu \
 ../NodeAdvance.cu \
 ../AreaTrianglesEnergy.cu \
 ../BendingTrianglesEnergy.cu \
 ../LinearSpringsEnergy.cu \
-../LJEnergy.cu \
 ../MemRepulsionEnergy.cu \
 ../System.cu \
 ../Edgeswap_test.cpp \
@@ -41,11 +43,13 @@ OBJS += \
 ./MemRepulsionSprings.o\
 ./LinearSprings.o \
 ./LJSprings.o \
+./LJSprings_LJ.o \
+./VolumeComp.o \
+./VolumeSprings.o \
 ./NodeAdvance.o \
 ./AreaTrianglesEnergy.o \
 ./BendingTrianglesEnergy.o \
 ./LinearSpringsEnergy.o \
-./LJEnergy.o \
 ./MemRepulsionEnergy.o \
 ./System.o \
 ./Edgeswap_test.o \
@@ -60,11 +64,13 @@ CPP_DEPS += \
 ./MemRepulsionSprings.d\
 ./LinearSprings.d \
 ./LJSprings.d \
+./LJSPrings_LJ.d \
+./VolumeComp.d \
+./VolumeSprings.d \
 ./NodeAdvance.d \
 ./AreaTrianglesEnergy.d \
 ./BendingTrianglesEnergy.d \
 ./LinearSpringsEnergy.d \
-./LJEnergy.d \
 ./MemRepulsionEnergy.d \
 ./System.d \
 ./Edgeswap_test.d \
@@ -75,9 +81,9 @@ CPP_DEPS += \
 #need o have ILIBS2
 #cpp files
 %.o : ./%.cpp 
-	 $(CXX) $(CFLAGS) $(ILIBS_cuda8) $(LIBS) -o $@ -c $^ 
+	 $(CXX) $(CFLAGS) $(ILIBSCPP) $(LIBS) -o $@ -c $^ 
 
 	
 #cuda files
 %.o : ./%.cu 
-	$(NVCC) $(NVCCFLAGS) $(ILIBS_cuda9) -dc -o $@ $^
+	$(NVCC) $(NVCCFLAGS) $(ILIBS1) -dc -o $@ $^

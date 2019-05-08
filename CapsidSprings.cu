@@ -60,14 +60,14 @@ void ComputeCapsideSprings(
                 thrust::raw_pointer_cast(auxVecs.keyEnd.data())) );
                 
   /*  std::cout<<"here"<<std::flush;
-    unsigned bucket = capsidInfoVecs.bucketKeys[35];
-    unsigned keyBegin = auxVecs.keyBegin[bucket];
-    unsigned keyEnd = auxVecs.keyEnd[bucket];
+    int bucket = capsidInfoVecs.bucketKeys[35];
+    int keyBegin = auxVecs.keyBegin[bucket];
+    int keyEnd = auxVecs.keyEnd[bucket];
     
     std::cout<<"bucket35: "<< bucket<<std::endl;
-    for (unsigned i = keyBegin; i < keyEnd; i++) { 
+    for (int i = keyBegin; i < keyEnd; i++) { 
         
-        unsigned memId = auxVecs.bucketValuesIncludingNeighbor[i];
+        int memId = auxVecs.bucketValuesIncludingNeighbor[i];
         double xLoc_LR = capsidInfoVecs.nodeLocX[35] - coordInfoVecs.nodeLocX[memId];
         double yLoc_LR = capsidInfoVecs.nodeLocY[35] - coordInfoVecs.nodeLocY[memId];
         double zLoc_LR = capsidInfoVecs.nodeLocZ[35] - coordInfoVecs.nodeLocZ[memId];
@@ -88,10 +88,10 @@ void ComputeCapsideSprings(
     //then reduce by unique membrane id.
     
     //shuffle indices for permutation. This must be redone each time step
-    std::vector<unsigned> hostIndices;
+    std::vector<int> hostIndices;
 
     hostIndices.reserve(capsidInfoVecs.tempMembraneId.size());
-    for (unsigned i = 0; i < capsidInfoVecs.tempMembraneId.size(); i++)
+    for (int i = 0; i < capsidInfoVecs.tempMembraneId.size(); i++)
         hostIndices.push_back(i);
     
     std::random_device seed;
@@ -100,7 +100,7 @@ void ComputeCapsideSprings(
     std::shuffle(hostIndices.begin(), hostIndices.end(), rng);
 
 
-    thrust::device_vector<unsigned> indexes = hostIndices;
+    thrust::device_vector<int> indexes = hostIndices;
 
     //randomly permute items first so that multiple id's have a chance of binding.
    /* thrust::sort_by_key(
@@ -124,7 +124,7 @@ void ComputeCapsideSprings(
                     thrust::make_permutation_iterator(
                         capsidInfoVecs.tempNodeForceZ.begin(),
                         indexes.begin()) )), 
-                thrust::less<unsigned>());
+                thrust::less<int>());
 */
     //capsid id's are already unique, so we need to order mem_id
     //first sort by lengths to take minimal distance, 
@@ -145,7 +145,7 @@ void ComputeCapsideSprings(
                 capsidInfoVecs.tempCapsideId.begin(),
                 capsidInfoVecs.tempNodeForceX.begin(),
                 capsidInfoVecs.tempNodeForceY.begin(),
-                capsidInfoVecs.tempNodeForceZ.begin() )), thrust::less<unsigned>());//now sorting unsigned
+                capsidInfoVecs.tempNodeForceZ.begin() )), thrust::less<int>());//now sorting int
     
     //now given that the membrane id's are sorted, we sort them by ascending lengths while 
     //keeping them sorted.
@@ -154,12 +154,12 @@ void ComputeCapsideSprings(
    //on id's so that distance is preserved. 
    /*
 if (generalParams.iteration % 100 == 0) {
-    for (unsigned i = 0; i < capsidInfoVecs.tempLengthsPairs.size(); i++){
+    for (int i = 0; i < capsidInfoVecs.tempLengthsPairs.size(); i++){
         std::cout<< "post stable sort " <<" cap Id: "<< capsidInfoVecs.tempCapsideId[i]<< " << mem Id: "<< capsidInfoVecs.tempMembraneId[i]<< " "<< capsidInfoVecs.tempNodeForceX[i] << " "<<capsidInfoVecs.tempNodeForceY[i] << " "<<capsidInfoVecs.tempNodeForceZ[i] << std::endl;
         std::cout<<"dist: "<< capsidInfoVecs.tempLengthsPairs[i]<< std::endl;
     }
 }*/
-    unsigned endKey = thrust::get<0>(
+    int endKey = thrust::get<0>(
         thrust::unique_by_key(
             //input key
             capsidInfoVecs.tempMembraneId.begin(), capsidInfoVecs.tempMembraneId.end(),
@@ -170,7 +170,7 @@ if (generalParams.iteration % 100 == 0) {
                 capsidInfoVecs.tempNodeForceX.begin(),
                 capsidInfoVecs.tempNodeForceY.begin(),
                 capsidInfoVecs.tempNodeForceZ.begin())),
-        thrust::equal_to<unsigned>() )) - capsidInfoVecs.tempMembraneId.begin();//binary_pred 
+        thrust::equal_to<int>() )) - capsidInfoVecs.tempMembraneId.begin();//binary_pred 
     
     capsidInfoVecs.num_connections=endKey-1;//endkey includes the last bad id which is larger than the maxnodecount
 
@@ -180,7 +180,7 @@ if (generalParams.iteration % 100 == 0) {
    
 /*
 if (generalParams.iteration % 100 == 0) {
-    for (unsigned i = 0; i < endKey; i++){
+    for (int i = 0; i < endKey; i++){
         std::cout<< "post unique " <<" cap Id: "<< capsidInfoVecs.tempCapsideId[i]<< " << mem Id: "<< capsidInfoVecs.tempMembraneId[i]<< " "<< capsidInfoVecs.tempNodeForceX[i] << " "<<capsidInfoVecs.tempNodeForceY[i] << " "<<capsidInfoVecs.tempNodeForceZ[i] << std::endl;
         std::cout<<"dist: "<< capsidInfoVecs.tempLengthsPairs[i]<< std::endl;
     }
@@ -206,7 +206,7 @@ if (generalParams.iteration % 100 == 0) {
 
 
    /* if (generalParams.iteration %10000 == 0) {
-        for (unsigned i = 0; i < endKey; i++){
+        for (int i = 0; i < endKey; i++){
             std::cout<< "post add " <<" cap Id: "<< capsidInfoVecs.tempCapsideId[i]<< " << mem Id: "<< capsidInfoVecs.tempMembraneId[i]<< " "<< capsidInfoVecs.tempNodeForceX[i] << " "<<capsidInfoVecs.tempNodeForceY[i] << " "<<capsidInfoVecs.tempNodeForceZ[i] << std::endl;
             std::cout<<"dist: "<< capsidInfoVecs.tempLengthsPairs[i]<< std::endl;
         }

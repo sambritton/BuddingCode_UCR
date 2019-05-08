@@ -10,12 +10,12 @@ void ComputeCapsideSpringsAll(
     AuxVecs& auxVecs);
     
 struct CapsidSpringFunctorAll {
-    unsigned factor;
+    int factor;
     double length_cutoff;
     double spring_constant;
     double length_zero;
-    unsigned capsidMaxNode;
-    unsigned membraneMaxNode;
+    int capsidMaxNode;
+    int membraneMaxNode;
     
     double* capsidNodeXAddr;
     double* capsidNodeYAddr;
@@ -24,20 +24,20 @@ struct CapsidSpringFunctorAll {
     double* membraneNodeYAddr;
     double* membraneNodeZAddr;
 
-    unsigned* capsidIdUnreduced;
-    unsigned* membraneIdUnreduced;
+    int* capsidIdUnreduced;
+    int* membraneIdUnreduced;
     double* forceXAddr;
     double* forceYAddr;
     double* forceZAddr;
     
 	__host__ __device__ 
     CapsidSpringFunctorAll(  
-    unsigned& _factor,
+    int& _factor,
     double& _length_cutoff,  
     double& _spring_constant,
     double& _length_zero,
-    unsigned& _capsidMaxNode,
-    unsigned& _membraneMaxNode,
+    int& _capsidMaxNode,
+    int& _membraneMaxNode,
     
     double* _capsidNodeXAddr,
     double* _capsidNodeYAddr,
@@ -46,8 +46,8 @@ struct CapsidSpringFunctorAll {
     double* _membraneNodeYAddr,
     double* _membraneNodeZAddr,
 
-    unsigned* _capsidIdUnreduced,
-    unsigned* _membraneIdUnreduced,
+    int* _capsidIdUnreduced,
+    int* _membraneIdUnreduced,
     double* _forceXAddr,
     double* _forceYAddr,
     double* _forceZAddr ) :
@@ -75,11 +75,11 @@ struct CapsidSpringFunctorAll {
 	__device__
     void operator() (const Tuuu& u3) {
 
-        unsigned counter = thrust::get<0>(u3);
-        unsigned place = factor * counter;//force and id writing location to unreduced vectors
+        int counter = thrust::get<0>(u3);
+        int place = factor * counter;//force and id writing location to unreduced vectors
 
-		unsigned bucketId = thrust::get<1>(u3);//bucket containing nodeId
-		unsigned capsidId = thrust::get<2>(u3);//node to attempt link from.
+		int bucketId = thrust::get<1>(u3);//bucket containing nodeId
+		int capsidId = thrust::get<2>(u3);//node to attempt link from.
 	
 
         double xLoc_LR;
@@ -92,9 +92,9 @@ struct CapsidSpringFunctorAll {
 
 
         //iterate through membrane id's and choose closest one under cutoff length
-       // for (unsigned i = beginIndex; i < endIndex; i++ ) {
-        for (unsigned memId = 0; memId < membraneMaxNode; memId++) {
-            //unsigned memId = bucketNbrsExp[i];
+       // for (int i = beginIndex; i < endIndex; i++ ) {
+        for (int memId = 0; memId < membraneMaxNode; memId++) {
+            //int memId = bucketNbrsExp[i];
             if (memId < membraneMaxNode) {
                 xLoc_LR = membraneNodeXAddr[memId] - capsidNodeXAddr[capsidId];
                 yLoc_LR = membraneNodeYAddr[memId] - capsidNodeYAddr[capsidId];

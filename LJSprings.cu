@@ -11,14 +11,15 @@ void ComputeLJSprings(
     GeneralParams& generalParams) {    
      
     CVec4 init(0.0, 0.0, 0.0, 0.0); 
-    thrust::counting_iterator<unsigned> begin(0);
-    thrust::counting_iterator<unsigned> end(generalParams.maxNodeCount);
+    thrust::counting_iterator<int> begin(0);
+    thrust::counting_iterator<int> end(generalParams.num_of_nodes);
 CVec4 temp = thrust::transform_reduce(  
                     begin,end,
                     LJSpringFunctor(
-                        ljInfoVecs.Rcutoff, 
-                        ljInfoVecs.Rmin,
-                        ljInfoVecs.epsilon,
+                        ljInfoVecs.Rcutoff_M, 
+                        ljInfoVecs.Rmin_M,
+                        ljInfoVecs.epsilon_M_rep1,
+                        ljInfoVecs.epsilon_M_rep2,
                         ljInfoVecs.LJ_PosX,
                         ljInfoVecs.LJ_PosY,
                         ljInfoVecs.LJ_PosZ,
@@ -35,9 +36,10 @@ CVec4 temp = thrust::transform_reduce(
     ljInfoVecs.forceY = thrust::get<1>(temp);
     ljInfoVecs.forceZ = thrust::get<2>(temp);
 
-    ljInfoVecs.lj_energy = thrust::get<3>(temp);
+    ljInfoVecs.lj_energy_M = thrust::get<3>(temp);
       
-	//std::cout<<"lj points "<< ljInfoVecs.LJ_PosX<< " "<<  ljInfoVecs.LJ_PosY << " "<<  ljInfoVecs.LJ_PosZ << std::endl;
+    //std::cout<<"lj force from membrane "<< ljInfoVecs.forceX<< " "<<  ljInfoVecs.forceY << " "<<  ljInfoVecs.forceZ << std::endl;
+    //std::cout<<"lj energy from membrane "<<ljInfoVecs.lj_energy_M<<std::endl;
 
 };
 
@@ -45,7 +47,8 @@ void AdvanceLJParticle(
     GeneralParams& generalParams,
     CoordInfoVecs& coordInfoVecs,
     LJInfoVecs& ljInfoVecs) {
-
+    
+    
     ljInfoVecs.LJ_PosX = ljInfoVecs.LJ_PosX + generalParams.dt * ljInfoVecs.forceX;
     ljInfoVecs.LJ_PosY = ljInfoVecs.LJ_PosY + generalParams.dt * ljInfoVecs.forceY;
     ljInfoVecs.LJ_PosZ = ljInfoVecs.LJ_PosZ + generalParams.dt * ljInfoVecs.forceZ;

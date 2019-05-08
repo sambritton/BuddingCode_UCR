@@ -25,7 +25,7 @@ void AdvancePositions(
 					coordInfoVecs.isNodeFixed.begin(),
 					coordInfoVecs.nodeLocX.begin(),
 					coordInfoVecs.nodeLocY.begin(),
-					coordInfoVecs.nodeLocZ.begin())) + generalParams.maxNodeCount,
+					coordInfoVecs.nodeLocZ.begin())) + generalParams.num_of_nodes,
 			//second vector begin
 			thrust::make_zip_iterator(
 				thrust::make_tuple(
@@ -41,7 +41,7 @@ void AdvancePositions(
 				SaxpyFunctorPrimary(
 				generalParams.dt,
 				generalParams.nodeMass,
-				generalParams.maxNodeCount,
+				generalParams.num_of_nodes,
 				domainParams.originMaxX,
 				domainParams.originMaxY,
 				domainParams.originMaxZ));

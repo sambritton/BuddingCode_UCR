@@ -29,12 +29,13 @@
 #include <thrust/execution_policy.h>
 #include <thrust/pair.h>
 #include <stdint.h>
+#include <bits/stdc++.h> 
 
 //
 struct CapsidInfoVecs {
-	thrust::device_vector<unsigned> id_bucket;	//bucket id
+	thrust::device_vector<int> id_bucket;	//bucket id
 	// bucket value means global rank of a certain point
-	thrust::device_vector<unsigned> id_value;//node id
+	thrust::device_vector<int> id_value;//node id
 
  	thrust::device_vector<double> nodeLocX;
 	thrust::device_vector<double> nodeLocY;
@@ -42,8 +43,8 @@ struct CapsidInfoVecs {
 
 
 	//used for capside linear springs binding to membrane
-	thrust::device_vector<unsigned> tempMembraneId;
-	thrust::device_vector<unsigned> tempCapsideId;
+	thrust::device_vector<int> tempMembraneId;
+	thrust::device_vector<int> tempCapsideId;
 
 	thrust::device_vector<double> tempLengthsPairs;
 	thrust::device_vector<double> tempNodeForceX;
@@ -51,13 +52,13 @@ struct CapsidInfoVecs {
 	thrust::device_vector<double> tempNodeForceZ;
 
 	//used for capside repulsion
-	unsigned factor = 10;//number of default nodes repulsion can interact with.
-	thrust::device_vector<unsigned> tempNodeIdUnreduced;
+	int factor = 10;//number of default nodes repulsion can interact with.
+	thrust::device_vector<int> tempNodeIdUnreduced;
 	thrust::device_vector<double> tempNodeForceXUnreduced;
 	thrust::device_vector<double> tempNodeForceYUnreduced;
 	thrust::device_vector<double> tempNodeForceZUnreduced;
 
-	thrust::device_vector<unsigned> tempNodeIdReduced;
+	thrust::device_vector<int> tempNodeIdReduced;
 	thrust::device_vector<double> tempNodeForceXReduced;
 	thrust::device_vector<double> tempNodeForceYReduced;
 	thrust::device_vector<double> tempNodeForceZReduced;
@@ -65,13 +66,13 @@ struct CapsidInfoVecs {
 	double spring_constant = 10.0;
 	double length_zero = 0.97;
 	double length_cutoff = 1.63;
-	unsigned maxNodeCount;
+	int maxNodeCount;
 	double viscosity = 1.0;
 	double forceX = 0.0;
 	double forceY = 0.0;
 	double forceZ = 0.0;
 
-	unsigned num_connections=0;
+	int num_connections=0;
 
 };
 
@@ -118,25 +119,25 @@ struct CoordInfoVecs {
 
 	//LOCAL COORDS
 	//indices of each triangle
-	unsigned num_triangles;
-	thrust::device_vector<unsigned> triangles2Nodes_1;
-	thrust::device_vector<unsigned> triangles2Nodes_2;
-	thrust::device_vector<unsigned> triangles2Nodes_3;
+	int num_triangles;
+	thrust::device_vector<int> triangles2Nodes_1;
+	thrust::device_vector<int> triangles2Nodes_2;
+	thrust::device_vector<int> triangles2Nodes_3;
 
 
 	//indices of each edge
-	unsigned num_edges;
-	thrust::device_vector<unsigned> edges2Nodes_1;
-	thrust::device_vector<unsigned> edges2Nodes_2;
+	int num_edges;
+	thrust::device_vector<int> edges2Nodes_1;
+	thrust::device_vector<int> edges2Nodes_2;
 
 	//indices of 2 triangle on each edge
-	thrust::device_vector<unsigned> edges2Triangles_1;
-	thrust::device_vector<unsigned> edges2Triangles_2;
+	thrust::device_vector<int> edges2Triangles_1;
+	thrust::device_vector<int> edges2Triangles_2;
 
 	//indices of edges on each triangle.
-	thrust::device_vector<unsigned> triangles2Edges_1;
-	thrust::device_vector<unsigned> triangles2Edges_2;
-	thrust::device_vector<unsigned> triangles2Edges_3;
+	thrust::device_vector<int> triangles2Edges_1;
+	thrust::device_vector<int> triangles2Edges_2;
+	thrust::device_vector<int> triangles2Edges_3;
 
 };
 
@@ -145,21 +146,21 @@ struct CoordInfoVecs {
 //struct used for linking of nodes in network
 struct AuxVecs {
 	// bucket key means which bucket ID does a certain point fit into
-	thrust::device_vector<unsigned> id_bucket;	//bucket id
+	thrust::device_vector<int> id_bucket;	//bucket id
 	// bucket value means global rank of a certain point
-	thrust::device_vector<unsigned> id_value;//node id
+	thrust::device_vector<int> id_value;//node id
 	// bucket key expanded means what are the bucket IDs are the neighbors of a certain point
-	thrust::device_vector<unsigned> id_bucket_expanded;
+	thrust::device_vector<int> id_bucket_expanded;
 	// bucket value expanded means each point ( represented by its global rank) will have multiple copies
-	thrust::device_vector<unsigned> id_value_expanded;
+	thrust::device_vector<int> id_value_expanded;
 
 	// begin position of a keys in id_bucket_expanded and id_value_expanded
 	//entry keyBegin[bucketKey] returns start of indices to link
-	thrust::device_vector<unsigned> keyBegin;
+	thrust::device_vector<int> keyBegin;
 	// end position of a keys in id_bucket_expanded and id_value_expanded
-	thrust::device_vector<unsigned> keyEnd;
+	thrust::device_vector<int> keyEnd;
 
-	unsigned endIndexid_bucket;
+	int endIndexid_bucket;
 };
 
 
@@ -178,44 +179,62 @@ struct DomainParams {
 	double originMinZ;
 	double originMaxZ;
 	double gridSpacing = 1.5;//bucket scheme search distance, must be larger than cutoff for capsid
-	unsigned XBucketCount;
-	unsigned YBucketCount;
-	unsigned ZBucketCount;
-	unsigned totalBucketCount = 0;
+	int XBucketCount;
+	int YBucketCount;
+	int ZBucketCount;
+	int totalBucketCount = 0;
 };
 
 struct LJInfoVecs{
 	double LJ_PosX;
 	double LJ_PosY;
 	double LJ_PosZ;
-	double Rmin=0.97;//1.0;
-	double Rcutoff=0.97;//1.0;
+	thrust::device_vector<double> LJ_PosX_all;
+	thrust::device_vector<double> LJ_PosY_all;
+	thrust::device_vector<double> LJ_PosZ_all;
 
-	double epsilon=1.0;
+
+
+	double Rmin_M=0.97;//1.0;
+	double Rcutoff_M=0.97;//1.0;
+	double Rmin_LJ;
+	double Rcutoff_LJ;
+
+	double epsilon_M=1.0;
+	double epsilon_M_rep1;
+	double epsilon_M_rep2;
+	double epsilon_LJ;
+	double epsilon_LJ_rep1;
+	double epsilon_LJ_rep2;
 	double spring_constant;
 
-	thrust::device_vector<unsigned> node_id_close;
-	double lj_energy;
+	thrust::device_vector<int> node_id_close;
+	double lj_energy_M;
+	double lj_energy_LJ;
 	double forceX;
 	double forceY;
 	double forceZ;
+	thrust::device_vector<double> forceX_all;
+	thrust::device_vector<double> forceY_all;
+	thrust::device_vector<double> forceZ_all;
 
 };
 
 struct AreaTriangleInfoVecs {
 
-	unsigned factor = 3;//used for reduction
+	int factor = 3;//used for reduction
 	double initial_area = 0.433;
 	double spring_constant;
+	double spring_constant_weak;
 
 	double area_triangle_energy;
 
-	thrust::device_vector<unsigned> tempNodeIdUnreduced;
+	thrust::device_vector<int> tempNodeIdUnreduced;
 	thrust::device_vector<double> tempNodeForceXUnreduced;
 	thrust::device_vector<double> tempNodeForceYUnreduced;
 	thrust::device_vector<double> tempNodeForceZUnreduced;
 
-	thrust::device_vector<unsigned> tempNodeIdReduced;
+	thrust::device_vector<int> tempNodeIdReduced;
 	thrust::device_vector<double> tempNodeForceXReduced;
 	thrust::device_vector<double> tempNodeForceYReduced;
 	thrust::device_vector<double> tempNodeForceZReduced;
@@ -223,10 +242,11 @@ struct AreaTriangleInfoVecs {
 };
 
 struct BendingTriangleInfoVecs {
-	unsigned numBendingSprings=0;
+	int numBendingSprings=0;
 
-	unsigned factor = 4;//used for reduction
+	int factor = 4;//used for reduction
 	double spring_constant;
+	double spring_constant_weak;
 	double spring_constant_raft;
 	double spring_constant_coat;
 	double initial_angle = 0.0;//radians
@@ -235,20 +255,21 @@ struct BendingTriangleInfoVecs {
 
 	double bending_triangle_energy;
 
-	thrust::device_vector<unsigned> tempNodeIdUnreduced;
+	thrust::device_vector<int> tempNodeIdUnreduced;
 	thrust::device_vector<double> tempNodeForceXUnreduced;
 	thrust::device_vector<double> tempNodeForceYUnreduced;
 	thrust::device_vector<double> tempNodeForceZUnreduced;
 
-	thrust::device_vector<unsigned> tempNodeIdReduced;
+	thrust::device_vector<int> tempNodeIdReduced;
 	thrust::device_vector<double> tempNodeForceXReduced;
 	thrust::device_vector<double> tempNodeForceYReduced;
 	thrust::device_vector<double> tempNodeForceZReduced;
 };
 struct LinearSpringInfoVecs {
 
-	unsigned factor = 2;//used for reduction
+	int factor = 2;//used for reduction
 	double spring_constant;
+	double spring_constant_weak;
 	double spring_constant_att1;
 	double spring_constant_att2;
 	double spring_constant_rep1; //This is the "D" in Morse potential
@@ -260,12 +281,12 @@ struct LinearSpringInfoVecs {
 	
 	thrust::device_vector<double> edge_initial_length;
 
-	thrust::device_vector<unsigned> tempNodeIdUnreduced;
+	thrust::device_vector<int> tempNodeIdUnreduced;
 	thrust::device_vector<double> tempNodeForceXUnreduced;
 	thrust::device_vector<double> tempNodeForceYUnreduced;
 	thrust::device_vector<double> tempNodeForceZUnreduced;
 
-	thrust::device_vector<unsigned> tempNodeIdReduced;
+	thrust::device_vector<int> tempNodeIdReduced;
 	thrust::device_vector<double> tempNodeForceXReduced;
 	thrust::device_vector<double> tempNodeForceYReduced;
 	thrust::device_vector<double> tempNodeForceZReduced;
@@ -274,17 +295,38 @@ struct LinearSpringInfoVecs {
 struct GeneralParams{
 	double kT;
 	double tau;
-	unsigned solve_time=100;
+	int solve_time=100;
 	double Rmin = 1.0; //Current mesh minimum edge length, subject to change.
 	double abs_Rmin;
-	unsigned iteration = 0;
-	unsigned maxNodeCount;
+	int iteration = 0;
+	int maxNodeCount;
+	int maxNodeCountLJ;
 	//parameters for advancing timestep and determining equilibrium
 
 	double dt;
 	double nodeMass = 1.0;
-	thrust::device_vector<double> edge_to_ljparticle;
+	thrust::device_vector<int> edge_to_ljparticle;
+	thrust::device_vector<int> nodes_in_upperhem;
+	thrust::device_vector<int> edges_in_upperhem;
+	thrust::device_vector<int> edges_in_upperhem_index;
+	thrust::device_vector<int> triangles_in_upperhem;
+	double centerX = 0.0;
+	double centerY = 0.0;
+	double centerZ = 0.0;
 
+	double current_total_volume;
+	double true_current_total_volume;
+	double eq_total_volume;
+	double volume_spring_constant;
+	double volume_energy;
+
+	int num_of_nodes;
+	int num_of_triangles;
+	int num_of_edges;
+	int edgeswap_iteration = 0;
+
+	
+	int mem_prealloc = 1; //This is an integer factor for expansion of the size of vectors.
 };
 
 

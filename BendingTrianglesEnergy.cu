@@ -9,7 +9,7 @@ double ComputeCosTrianglesEnergy(
     BendingTriangleInfoVecs& bendingTriangleInfoVecs) {
 	
     
-    thrust::counting_iterator<unsigned> elemId(0); 
+    thrust::counting_iterator<int> elemId(0); 
 
 	//bendingTriangleInfoVecs.initial_angle = 1.5707963267/2.0;
 	/*thrust::fill(bendingTriangleInfoVecs.tempNodeForceXReduced.begin(),bendingTriangleInfoVecs.tempNodeForceXReduced.end(),0.0);

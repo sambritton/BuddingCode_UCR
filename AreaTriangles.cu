@@ -7,7 +7,7 @@ void ComputeAreaTriangleSprings(
     CoordInfoVecs& coordInfoVecs,
     AreaTriangleInfoVecs& areaTriangleInfoVecs) {
 
-        thrust::counting_iterator<unsigned> elemId(0);
+        thrust::counting_iterator<int> elemId(0);
         
         thrust::fill(areaTriangleInfoVecs.tempNodeForceXReduced.begin(),areaTriangleInfoVecs.tempNodeForceXReduced.end(),0.0);
         thrust::fill(areaTriangleInfoVecs.tempNodeForceYReduced.begin(),areaTriangleInfoVecs.tempNodeForceYReduced.end(),0.0);
@@ -16,7 +16,7 @@ void ComputeAreaTriangleSprings(
         thrust::fill(areaTriangleInfoVecs.tempNodeForceYUnreduced.begin(),areaTriangleInfoVecs.tempNodeForceYUnreduced.end(),0.0);
         thrust::fill(areaTriangleInfoVecs.tempNodeForceZUnreduced.begin(),areaTriangleInfoVecs.tempNodeForceZUnreduced.end(),0.0);
     
-        
+        std::cout<<"ERROR 21"<<std::endl;
         areaTriangleInfoVecs.area_triangle_energy = thrust::transform_reduce( 
 			thrust::make_zip_iterator(
 				thrust::make_tuple(
@@ -29,10 +29,12 @@ void ComputeAreaTriangleSprings(
                     elemId,
 					coordInfoVecs.triangles2Nodes_1.begin(),
 					coordInfoVecs.triangles2Nodes_2.begin(),
-					coordInfoVecs.triangles2Nodes_3.begin())) + coordInfoVecs.num_triangles,
+					coordInfoVecs.triangles2Nodes_3.begin())) + coordInfoVecs.triangles2Nodes_1.size(),//generalParams.num_of_triangles,//coordInfoVecs.num_triangles,
             AreaSpringFunctor( 
                 areaTriangleInfoVecs.initial_area,
                 areaTriangleInfoVecs.spring_constant,
+                areaTriangleInfoVecs.spring_constant_weak,
+                thrust::raw_pointer_cast(generalParams.triangles_in_upperhem.data()),
                 thrust::raw_pointer_cast(coordInfoVecs.nodeLocX.data()),
                 thrust::raw_pointer_cast(coordInfoVecs.nodeLocY.data()),
                 thrust::raw_pointer_cast(coordInfoVecs.nodeLocZ.data()),
@@ -42,7 +44,7 @@ void ComputeAreaTriangleSprings(
                 thrust::raw_pointer_cast(areaTriangleInfoVecs.tempNodeForceZUnreduced.data())),
             0.0, thrust::plus<double>() );
         
-        
+            std::cout<<"ERROR 22"<<std::endl;
         //now we have un reduced forces. Sort by id and reduce. 
         //key, then value. Each vector returns sorted		
 		thrust::sort_by_key(areaTriangleInfoVecs.tempNodeIdUnreduced.begin(), areaTriangleInfoVecs.tempNodeIdUnreduced.end(),
@@ -50,9 +52,9 @@ void ComputeAreaTriangleSprings(
 				thrust::make_tuple(
 					areaTriangleInfoVecs.tempNodeForceXUnreduced.begin(),
 					areaTriangleInfoVecs.tempNodeForceYUnreduced.begin(),
-					areaTriangleInfoVecs.tempNodeForceZUnreduced.begin())), thrust::less<unsigned>());
+					areaTriangleInfoVecs.tempNodeForceZUnreduced.begin())), thrust::less<int>());
 
-        unsigned endKey = thrust::get<0>(
+        int endKey = thrust::get<0>(
             thrust::reduce_by_key(
                 areaTriangleInfoVecs.tempNodeIdUnreduced.begin(), 
                 areaTriangleInfoVecs.tempNodeIdUnreduced.end(),
@@ -67,8 +69,8 @@ void ComputeAreaTriangleSprings(
                     areaTriangleInfoVecs.tempNodeForceXReduced.begin(),
                     areaTriangleInfoVecs.tempNodeForceYReduced.begin(),
                     areaTriangleInfoVecs.tempNodeForceZReduced.begin())),
-            thrust::equal_to<unsigned>(), CVec3Add())) - areaTriangleInfoVecs.tempNodeIdReduced.begin();//binary_pred, binary_op 
-        
+            thrust::equal_to<int>(), CVec3Add())) - areaTriangleInfoVecs.tempNodeIdReduced.begin();//binary_pred, binary_op 
+            std::cout<<"ERROR 23"<<std::endl;
 
         //apply reduced force to all nodes. 
         thrust::for_each(

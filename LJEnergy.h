@@ -53,7 +53,7 @@ struct LJEnergyFunctor {
         locZAddr(_locZAddr){}
 
 	//hand in counting iterator and id of two edges and preferred length
-	__device__ double operator()(const unsigned & id) {
+	__device__ double operator()(const int & id) {
         		
         // compute forces
         double xLoc = locXAddr[id];

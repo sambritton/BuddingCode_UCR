@@ -19,7 +19,7 @@ void ComputeMemRepulsionSprings(
     thrust::fill(coordInfoVecs.tempNodeForceZUnreduced.begin(),coordInfoVecs.tempNodeForceZUnreduced.end(),0.0);*/
 
     //CVec4 init(0.0, 0.0, 0.0, 0.0); 
-    thrust::counting_iterator<unsigned> begin(0);
+    thrust::counting_iterator<int> begin(0);
 
     thrust::transform(  
         thrust::make_zip_iterator(
@@ -36,7 +36,7 @@ void ComputeMemRepulsionSprings(
                 auxVecs.id_bucket.begin(),
                 coordInfoVecs.nodeForceX.begin(),
                 coordInfoVecs.nodeForceY.begin(),
-                coordInfoVecs.nodeForceZ.begin())) + generalParams.maxNodeCount,
+                coordInfoVecs.nodeForceZ.begin())) + generalParams.num_of_nodes,
 
         thrust::make_zip_iterator(
             thrust::make_tuple(
@@ -49,20 +49,20 @@ void ComputeMemRepulsionSprings(
                 generalParams.abs_Rmin,
                 linearSpringInfoVecs.spring_constant_rep1,
                 linearSpringInfoVecs.spring_constant_rep2,
-                generalParams.maxNodeCount,
+                generalParams.num_of_nodes,
                 
                 thrust::raw_pointer_cast(coordInfoVecs.nndata1.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata2.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata3.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata4.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata5.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata6.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata7.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata8.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata9.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata10.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata11.data()),
-            thrust::raw_pointer_cast(coordInfoVecs.nndata12.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata2.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata3.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata4.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata5.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata6.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata7.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata8.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata9.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata10.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata11.data()),
+                thrust::raw_pointer_cast(coordInfoVecs.nndata12.data()),
 
                 thrust::raw_pointer_cast(coordInfoVecs.nodeLocX.data()),
                 thrust::raw_pointer_cast(coordInfoVecs.nodeLocY.data()),
@@ -71,8 +71,8 @@ void ComputeMemRepulsionSprings(
                           
                 thrust::raw_pointer_cast(auxVecs.id_value_expanded.data()),
                 thrust::raw_pointer_cast(auxVecs.keyBegin.data()),
-                thrust::raw_pointer_cast(auxVecs.keyEnd.data())) );
+                thrust::raw_pointer_cast(auxVecs.keyEnd.data()))
+            );
                      
-   
 };
 

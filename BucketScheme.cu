@@ -52,7 +52,7 @@ void initDimensionBucketScheme(
  
 	}
 	
-	unsigned temp_bucket_count = domainParams.XBucketCount * domainParams.YBucketCount * domainParams.ZBucketCount;
+	int temp_bucket_count = domainParams.XBucketCount * domainParams.YBucketCount * domainParams.ZBucketCount;
 
  	if (temp_bucket_count != domainParams.totalBucketCount) {
 		std::cout<<"grid: "<< domainParams.gridSpacing <<std::endl;
@@ -86,10 +86,10 @@ void extendBucketScheme(
 	AuxVecs& auxVecs) {
 		
 	//memory is already allocated. 
-	unsigned endIndexExpanded = (auxVecs.endIndexid_bucket) * 27;
+	int endIndexExpanded = (auxVecs.endIndexid_bucket) * 27;
 
 	//test for removing copies. 
-	unsigned valuesCount = auxVecs.id_value.size();
+	int valuesCount = auxVecs.id_value.size();
 	thrust::fill(auxVecs.id_bucket_expanded.begin(),auxVecs.id_bucket_expanded.end(),0);
 	thrust::fill(auxVecs.id_value_expanded.begin(),auxVecs.id_value_expanded.end(),0);
 
@@ -98,14 +98,14 @@ void extendBucketScheme(
 	/*
 	* beginning of constant iterator
 	*/
-	thrust::constant_iterator<unsigned> first(27);
+	thrust::constant_iterator<int> first(27);
 	/** 
 	* end of constant iterator.
 	* the plus sign only indicate movement of position, not value.
 	* e.g. movement is 5 and first iterator is initialized as 9
 	* result array is [9,9,9,9,9];
 	*/
-	thrust::constant_iterator<unsigned> last = first + (auxVecs.endIndexid_bucket); // this is NOT numerical addition!
+	thrust::constant_iterator<int> last = first + (auxVecs.endIndexid_bucket); // this is NOT numerical addition!
 
 	expand(first, last,
 		thrust::make_zip_iterator(
@@ -118,7 +118,7 @@ void extendBucketScheme(
 				auxVecs.id_value_expanded.begin())));
 		
 
-	thrust::counting_iterator<unsigned> countingBegin(0);
+	thrust::counting_iterator<int> countingBegin(0);
 
 	thrust::transform(
 		thrust::make_zip_iterator(
@@ -138,11 +138,11 @@ void extendBucketScheme(
 
 
 
-	//unsigned numberOfOutOfRange = thrust::count_if(auxVecs.id_bucket_expanded.begin(),
+	//int numberOfOutOfRange = thrust::count_if(auxVecs.id_bucket_expanded.begin(),
 	//	auxVecs.id_bucket_expanded.end(), is_greater_than(domainParams.totalBucketCount) );
-	//unsigned numberInsideRange = endIndexExpanded - numberOfOutOfRange;
+	//int numberInsideRange = endIndexExpanded - numberOfOutOfRange;
 
-	//unsigned endIndexSearch = endIndexExpanded - numberOfOutOfRange;
+	//int endIndexSearch = endIndexExpanded - numberOfOutOfRange;
 
 	thrust::sort_by_key(auxVecs.id_bucket_expanded.begin(),
 		auxVecs.id_bucket_expanded.end(),
@@ -163,7 +163,7 @@ void extendBucketScheme(
 
 */
 	
-	thrust::counting_iterator<unsigned> search_begin(0);
+	thrust::counting_iterator<int> search_begin(0);
 
 	thrust::lower_bound(auxVecs.id_bucket_expanded.begin(),
 		auxVecs.id_bucket_expanded.end(), search_begin,
@@ -186,7 +186,7 @@ void buildBucketScheme(
 	CapsidInfoVecs& capsidInfoVecs) {
 
 
-	thrust::counting_iterator<unsigned> indexBucketBegin(0);
+	thrust::counting_iterator<int> indexBucketBegin(0);
 	// takes counting iterator and coordinates
 	// return tuple of keys and values
 	// transform the points to their bucket indices
@@ -216,7 +216,7 @@ void buildBucketScheme(
 			domainParams.gridSpacing));
 
 	//transform capsid points to buckets. 
-	thrust::counting_iterator<unsigned> indexCapsidBucketBegin(0);
+	thrust::counting_iterator<int> indexCapsidBucketBegin(0);
 
 /*	thrust::transform(
 		thrust::make_zip_iterator(

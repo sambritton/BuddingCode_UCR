@@ -15,23 +15,24 @@
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-Edgeswap::Edgeswap(CoordInfoVecs& coordInfoVecs) {
+Edgeswap::Edgeswap(CoordInfoVecs& coordInfoVecs,
+GeneralParams& generalParams) {
             
-    unsigned nnode = coordInfoVecs.nodeLocX.size();
+    int nnode = generalParams.num_of_nodes;
     std::vector<bool> boundary_node_temp(nnode,false);
-    for (unsigned i = 0; i < nnode; i++){
+    for (int i = 0; i < nnode; i++){
         if (coordInfoVecs.edges2Triangles_1[i] == coordInfoVecs.edges2Triangles_2[i]){
             boundary_node_temp[coordInfoVecs.edges2Nodes_1[i]] = true;
             boundary_node_temp[coordInfoVecs.edges2Nodes_2[i]] = true;
         }
     }
     
-    //This creates a unsigned vector whose length equals to number of nodes.
+    //This creates a int vector whose length equals to number of nodes.
     //The initial mesh has every node paired with 6 neighboring nodes. 
     //During the simulation, the number will be updated accordingly. Therefore this has to be moved
     //to another location to avoid re-initialization every time Edgeswap is called.
 
-    std::vector<unsigned> nndata_temp(nnode, 6);
+    std::vector<int> nndata_temp(nnode, 6);
     
     boundary_node = boundary_node_temp;
     nndata = nndata_temp;
@@ -43,7 +44,7 @@ Edgeswap::Edgeswap(CoordInfoVecs& coordInfoVecs) {
 //The goal is to perform the swap without explicitly creating a copy of the whole data structure.
 //This is achieved by extracting the full info of a smaller affected system.
 int Edgeswap::edge_swap_device_vecs(
-    unsigned iedge, 
+    int iedge, 
     GeneralParams& generalParams,
     CoordInfoVecs& coordInfoVecs,
     LinearSpringInfoVecs& linearSpringInfoVecs,
@@ -52,11 +53,16 @@ int Edgeswap::edge_swap_device_vecs(
 
     int alpha = 0;
         
-    unsigned HEAD,TAIL;
-    unsigned H0, T0,H1,H2,T1,T2;
-    unsigned edge_start, edge_end;
-    unsigned a1, b1, c1, a2, b2, c2;
+    int HEAD,TAIL;
+    int H0, T0,H1,H2,T1,T2;
+    int edge_start, edge_end;
+    int a1, b1, c1, a2, b2, c2;
     double temp_bend = 0.0;
+    double linear_spring_constant;
+    double bend_spring_constant;
+    double vol_0, vol_1;
+    double P0x_vol1, P0y_vol1, P0z_vol1, P0x_vol2, P0y_vol2, P0z_vol2;
+    double N1x_vol, N1y_vol, N1z_vol, N2x_vol, N2y_vol, N2z_vol;
         
     if ( coordInfoVecs.edges2Triangles_1[iedge] != coordInfoVecs.edges2Triangles_2[iedge]){
         H0 = coordInfoVecs.edges2Triangles_1[iedge];//index of the 1st triangle to i-th edge
@@ -106,12 +112,12 @@ int Edgeswap::edge_swap_device_vecs(
 
         //Now search for the associated 
 
-        unsigned CANDIDATE1_1 = coordInfoVecs.triangles2Nodes_1[H0];
-        unsigned CANDIDATE1_2 = coordInfoVecs.triangles2Nodes_2[H0];
-        unsigned CANDIDATE1_3 = coordInfoVecs.triangles2Nodes_3[H0];
-        unsigned CANDIDATE2_1 = coordInfoVecs.triangles2Nodes_1[T0];
-        unsigned CANDIDATE2_2 = coordInfoVecs.triangles2Nodes_2[T0];
-        unsigned CANDIDATE2_3 = coordInfoVecs.triangles2Nodes_3[T0];
+        int CANDIDATE1_1 = coordInfoVecs.triangles2Nodes_1[H0];
+        int CANDIDATE1_2 = coordInfoVecs.triangles2Nodes_2[H0];
+        int CANDIDATE1_3 = coordInfoVecs.triangles2Nodes_3[H0];
+        int CANDIDATE2_1 = coordInfoVecs.triangles2Nodes_1[T0];
+        int CANDIDATE2_2 = coordInfoVecs.triangles2Nodes_2[T0];
+        int CANDIDATE2_3 = coordInfoVecs.triangles2Nodes_3[T0];
         
         if ((CANDIDATE1_1 != edge_start) 
             && (CANDIDATE1_1 != edge_end)) {
@@ -127,7 +133,7 @@ int Edgeswap::edge_swap_device_vecs(
         else {std::cout<<"tail not set" <<std::endl;}
 
 
-        //unsigned temp_edges2Nodes_2 = HEAD;
+        //int temp_edges2Nodes_2 = HEAD;
         //std::cout<<"head tail in loop: "<< HEAD << " "<< TAIL <<std::endl;
         //The small subsystem we will be working with is
         //          
@@ -150,24 +156,42 @@ int Edgeswap::edge_swap_device_vecs(
         //we can condense the linear spring energy computation to only one edge.
         //Bending energy is more complicated due to the need of unit normals.
         
-        std::vector<unsigned> edges_iteration(5);
+        std::vector<int> edges_iteration(5);
         edges_iteration[0] = iedge;
+        if (generalParams.edges_in_upperhem[edges_iteration[0]] == 1){
+                    linear_spring_constant = linearSpringInfoVecs.spring_constant_weak;
+                }
+                else{
+                    linear_spring_constant = linearSpringInfoVecs.spring_constant;
+        }
         edges_iteration[1] = H1;
         edges_iteration[2] = H2;
         edges_iteration[3] = T1;
         edges_iteration[4] = T2;
-            for (unsigned j = 0; j < 5; j++){
-               
-                unsigned Tri1 = coordInfoVecs.edges2Triangles_1[edges_iteration[j]];//index of the 1st triangle
-                unsigned Tri2 = coordInfoVecs.edges2Triangles_2[edges_iteration[j]];
-                //unsigned id_k = coordInfoVecs.edges2Nodes_1[edges_iteration[j]];
-                //unsigned id_i = coordInfoVecs.edges2Nodes_2[edges_iteration[j]];
+        
+            for (int j = 0; j < 5; j++){
+                if (generalParams.edges_in_upperhem[edges_iteration[j]] == 1){
+                    bend_spring_constant = bendingTriangleInfoVecs.spring_constant_weak;
+                }
+                else{
+                    bend_spring_constant = bendingTriangleInfoVecs.spring_constant;
+                }
+                int Tri1 = coordInfoVecs.edges2Triangles_1[edges_iteration[j]];//index of the 1st triangle
+                int Tri2 = coordInfoVecs.edges2Triangles_2[edges_iteration[j]];
+                //int id_k = coordInfoVecs.edges2Nodes_1[edges_iteration[j]];
+                //int id_i = coordInfoVecs.edges2Nodes_2[edges_iteration[j]];
 
                 double vec1x, vec1y, vec1z, vec2x, vec2y, vec2z;
+                
                 if (Tri1 != Tri2) {
-                    unsigned Tri1_n1 = coordInfoVecs.triangles2Nodes_1[Tri1];
-                    unsigned Tri1_n2 = coordInfoVecs.triangles2Nodes_2[Tri1];
-                    unsigned Tri1_n3 = coordInfoVecs.triangles2Nodes_3[Tri1];
+                    int Tri1_n1 = coordInfoVecs.triangles2Nodes_1[Tri1];
+                    if (j == 0){
+                        P0x_vol1 = coordInfoVecs.nodeLocX[Tri1_n1];
+                        P0y_vol1 = coordInfoVecs.nodeLocY[Tri1_n1];
+                        P0z_vol1 = coordInfoVecs.nodeLocZ[Tri1_n1];
+                    }
+                    int Tri1_n2 = coordInfoVecs.triangles2Nodes_2[Tri1];
+                    int Tri1_n3 = coordInfoVecs.triangles2Nodes_3[Tri1];
                     vec1x = coordInfoVecs.nodeLocX[Tri1_n2] - coordInfoVecs.nodeLocX[Tri1_n1];
                     vec1y = coordInfoVecs.nodeLocY[Tri1_n2] - coordInfoVecs.nodeLocY[Tri1_n1];
                     vec1z = coordInfoVecs.nodeLocZ[Tri1_n2] - coordInfoVecs.nodeLocZ[Tri1_n1];
@@ -181,9 +205,14 @@ int Edgeswap::edge_swap_device_vecs(
                     double nN1 = sqrt(pow(N1[0],2)+pow(N1[1],2)+pow(N1[2],2));
 					//std::cout<<"nN1 = "<<nN1<<std::endl;
 
-                    unsigned Tri2_n1 = coordInfoVecs.triangles2Nodes_1[Tri2];
-                    unsigned Tri2_n2 = coordInfoVecs.triangles2Nodes_2[Tri2];
-                    unsigned Tri2_n3 = coordInfoVecs.triangles2Nodes_3[Tri2];
+                    int Tri2_n1 = coordInfoVecs.triangles2Nodes_1[Tri2];
+                    int Tri2_n2 = coordInfoVecs.triangles2Nodes_2[Tri2];
+                    int Tri2_n3 = coordInfoVecs.triangles2Nodes_3[Tri2];
+                    if (j == 0){
+                        P0x_vol2 = coordInfoVecs.nodeLocX[Tri2_n1];
+                        P0y_vol2 = coordInfoVecs.nodeLocY[Tri2_n1];
+                        P0z_vol2 = coordInfoVecs.nodeLocZ[Tri2_n1];
+                    }
                     vec1x = coordInfoVecs.nodeLocX[Tri2_n2] - coordInfoVecs.nodeLocX[Tri2_n1];
                     vec1y = coordInfoVecs.nodeLocY[Tri2_n2] - coordInfoVecs.nodeLocY[Tri2_n1];
                     vec1z = coordInfoVecs.nodeLocZ[Tri2_n2] - coordInfoVecs.nodeLocZ[Tri2_n1];
@@ -211,13 +240,23 @@ int Edgeswap::edge_swap_device_vecs(
                     double theta_current = acos( cosAngle );
 					
                     
-                    double local_energy = bendingTriangleInfoVecs.spring_constant * (1 - cos(theta_current - bendingTriangleInfoVecs.initial_angle) );
+                    double local_energy = bend_spring_constant * (1 - cos(theta_current - bendingTriangleInfoVecs.initial_angle) );
+                    
+                    //bendingTriangleInfoVecs.spring_constant * (1 - cos(theta_current - bendingTriangleInfoVecs.initial_angle) );
                     temp_bend = temp_bend + local_energy;
 					/*std::cout<<"bending energy "<<local_energy<<std::endl;
-					for (unsigned COUNT = 0; COUNT < 3; COUNT++){
+					for (int COUNT = 0; COUNT < 3; COUNT++){
 					std::cout<<"unit normal 1 = "<<N1[COUNT]<<std::endl;
 					std::cout<<"unit normal 2 = "<<N2[COUNT]<<std::endl;}
 					std::cout<<"angle "<<theta_current<<std::endl;*/
+                    if (j == 0){
+                        N1x_vol = N1[0]/nN1;
+                        N1y_vol = N1[1]/nN1;
+                        N1z_vol = N1[2]/nN1;
+                        N2x_vol = N2[0]/nN2;
+                        N2y_vol = N2[1]/nN2;
+                        N2z_vol = N2[2]/nN2;
+                    }
                 }
             }
                
@@ -242,7 +281,7 @@ int Edgeswap::edge_swap_device_vecs(
 		//	(DISTANCE - generalParams.Rmin);
         //}
         //else{
-            linear_0 = (linearSpringInfoVecs.spring_constant/2)*(DISTANCE - generalParams.Rmin)*
+            linear_0 = (linear_spring_constant/2.0)*(DISTANCE - generalParams.Rmin)*
 			(DISTANCE - generalParams.Rmin);
         //}
         
@@ -260,12 +299,12 @@ int Edgeswap::edge_swap_device_vecs(
             pow(coordInfoVecs.nodeLocZ[edge_end] - coordInfoVecs.nodeLocZ[edge_start], 2.0)) - linearSpringInfoVecs.edge_initial_length[0]);*/
 			//std::cout<<"the energy of this edge is = "<<linear_0<<std::endl;
         
-        unsigned H0n1 = edge_start;//coordInfoVecs.triangles2Nodes_1[H0];
-        unsigned H0n2 = edge_end;//coordInfoVecs.triangles2Nodes_2[H0];
-        unsigned H0n3 = HEAD;//coordInfoVecs.triangles2Nodes_3[H0];
-        unsigned T0n1 = edge_start;//coordInfoVecs.triangles2Nodes_1[T0];
-        unsigned T0n2 = TAIL;//coordInfoVecs.triangles2Nodes_2[T0];
-        unsigned T0n3 = edge_end;//coordInfoVecs.triangles2Nodes_3[T0];
+        int H0n1 = edge_start;//coordInfoVecs.triangles2Nodes_1[H0];
+        int H0n2 = edge_end;//coordInfoVecs.triangles2Nodes_2[H0];
+        int H0n3 = HEAD;//coordInfoVecs.triangles2Nodes_3[H0];
+        int T0n1 = edge_start;//coordInfoVecs.triangles2Nodes_1[T0];
+        int T0n2 = TAIL;//coordInfoVecs.triangles2Nodes_2[T0];
+        int T0n3 = edge_end;//coordInfoVecs.triangles2Nodes_3[T0];
         double a = sqrt(pow((coordInfoVecs.nodeLocX[H0n2] - coordInfoVecs.nodeLocX[H0n1]),2.0) + 
                     pow((coordInfoVecs.nodeLocY[H0n2] - coordInfoVecs.nodeLocY[H0n1]),2.0) +
                     pow((coordInfoVecs.nodeLocZ[H0n2] - coordInfoVecs.nodeLocZ[H0n1]),2.0)
@@ -291,13 +330,29 @@ int Edgeswap::edge_swap_device_vecs(
                     pow((coordInfoVecs.nodeLocY[T0n3] - coordInfoVecs.nodeLocY[T0n2]),2.0) +
                     pow((coordInfoVecs.nodeLocZ[T0n3] - coordInfoVecs.nodeLocZ[T0n2]),2.0)
                     );
-        double mean_def = (d + e + f)/2;
+        double mean_def = (d + e + f)/2.0;
+        double area_spring_constant_1, area_spring_constant_2;
+        if (generalParams.triangles_in_upperhem[H0] == 1){
+            area_spring_constant_1 = areaTriangleInfoVecs.spring_constant_weak;
+        }
+        else{
+            area_spring_constant_1 = areaTriangleInfoVecs.spring_constant;
+        }
+        if (generalParams.triangles_in_upperhem[T0] == 1){
+            area_spring_constant_2 = areaTriangleInfoVecs.spring_constant_weak;
+        }
+        else{
+            area_spring_constant_2 = areaTriangleInfoVecs.spring_constant;
+        }
         double area_H0 = sqrt(mean_abc*(mean_abc - a)*(mean_abc - b)*(mean_abc - c));
         double area_T0 = sqrt(mean_def*(mean_def - d)*(mean_def - e)*(mean_def - f));
-        double area_0_energy = areaTriangleInfoVecs.spring_constant*pow((area_H0 - areaTriangleInfoVecs.initial_area),2.0)/(2*areaTriangleInfoVecs.initial_area) +
-                            areaTriangleInfoVecs.spring_constant*pow((area_T0 - areaTriangleInfoVecs.initial_area),2.0)/(2*areaTriangleInfoVecs.initial_area);
-
-        double E_0 = linear_0 + bend_0 + area_0_energy;
+        double area_0_energy = area_spring_constant_1*pow((area_H0 - areaTriangleInfoVecs.initial_area),2.0)/(2*areaTriangleInfoVecs.initial_area) +
+                            area_spring_constant_2*pow((area_T0 - areaTriangleInfoVecs.initial_area),2.0)/(2*areaTriangleInfoVecs.initial_area);
+        
+        double vol_H0 = (1.0/3.0)*(P0x_vol1*N1x_vol + P0y_vol1*N1y_vol + P0z_vol1*N1z_vol)*area_H0;
+        double vol_T0 = (1.0/3.0)*(P0x_vol2*N2x_vol + P0y_vol2*N2y_vol + P0z_vol2*N2z_vol)*area_T0;
+        vol_0 = vol_H0 + vol_T0;
+        double E_0 = linear_0 + bend_0 + area_0_energy + generalParams.volume_energy;
         /*std::cout<<"old linear energy: "<<linear_0<<std::endl;
         std::cout<<"old bend energy: "<<bend_0<<std::endl;
         std::cout<<"old area energy: "<<area_0_energy<<std::endl;
@@ -306,14 +361,14 @@ int Edgeswap::edge_swap_device_vecs(
         
         //Flip the edge, build the data structure for the smaller system.
         bool BAD_CHOICE = false;
-        unsigned temp_edges2Nodes_1 = TAIL;
-        unsigned temp_edges2Nodes_2 = HEAD;
+        int temp_edges2Nodes_1 = TAIL;
+        int temp_edges2Nodes_2 = HEAD;
 
-        unsigned temp_nndata_HEAD = nndata[HEAD] + 1;
-        unsigned temp_nndata_TAIL = nndata[TAIL] + 1;
-        unsigned temp_nndata_edge_start = nndata[edge_start] - 1;
+        int temp_nndata_HEAD = nndata[HEAD] + 1;
+        int temp_nndata_TAIL = nndata[TAIL] + 1;
+        int temp_nndata_edge_start = nndata[edge_start] - 1;
         
-        unsigned temp_nndata_edge_end = nndata[edge_end] - 1;
+        int temp_nndata_edge_end = nndata[edge_end] - 1;
         
         if (boundary_node[HEAD] == false && temp_nndata_HEAD < 3){
             BAD_CHOICE = true;
@@ -325,6 +380,18 @@ int Edgeswap::edge_swap_device_vecs(
             BAD_CHOICE = true;
         }
         else if (boundary_node[edge_end] == false && temp_nndata_edge_end < 3){
+            BAD_CHOICE = true;
+        }
+        else if (boundary_node[HEAD] == false && temp_nndata_HEAD > 12){
+            BAD_CHOICE = true;
+        }
+        else if (boundary_node[TAIL] == false && temp_nndata_TAIL > 12){
+            BAD_CHOICE = true;
+        }
+        else if (boundary_node[edge_start] == false && temp_nndata_edge_start > 12){
+            BAD_CHOICE = true;
+        }
+        else if (boundary_node[edge_end] == false && temp_nndata_edge_end > 12){
             BAD_CHOICE = true;
         }
         else {
@@ -364,8 +431,8 @@ int Edgeswap::edge_swap_device_vecs(
 
             
             //Creating vectors to compute the normal vectors under the swapped configuration.
-            unsigned H1t1 = coordInfoVecs.edges2Triangles_1[H1];
-            unsigned H1t2 = coordInfoVecs.edges2Triangles_2[H1]; //These are the associated triangles to edge H1
+            int H1t1 = coordInfoVecs.edges2Triangles_1[H1];
+            int H1t2 = coordInfoVecs.edges2Triangles_2[H1]; //These are the associated triangles to edge H1
             //For the following if statement, we identify the triangles that are affected by the edge-swap.
             //Since we do not know the exact index of the affected triangle, we use the if statement to consider possible cases.
             //This gives us the vectors necessary to compute unit normal vectors required for bending energy.
@@ -462,8 +529,8 @@ int Edgeswap::edge_swap_device_vecs(
                             H1t1_vec2z = coordInfoVecs.nodeLocZ[coordInfoVecs.triangles2Nodes_3[H1t1]] - coordInfoVecs.nodeLocZ[coordInfoVecs.triangles2Nodes_1[H1t1]];
 							//std::cout<<"H1t2 = H0"<<std::endl;
                             }
-            unsigned H2t1 = coordInfoVecs.edges2Triangles_1[H2];
-            unsigned H2t2 = coordInfoVecs.edges2Triangles_2[H2]; //These are the associated triangles to edge H2        
+            int H2t1 = coordInfoVecs.edges2Triangles_1[H2];
+            int H2t2 = coordInfoVecs.edges2Triangles_2[H2]; //These are the associated triangles to edge H2        
             if (H2t1 == H0){//In this case H2t1 turns into T0.
                             H2t1_vec1x = coordInfoVecs.nodeLocX[TAIL] - coordInfoVecs.nodeLocX[HEAD];
                             H2t1_vec1y = coordInfoVecs.nodeLocY[TAIL] - coordInfoVecs.nodeLocY[HEAD];
@@ -494,8 +561,8 @@ int Edgeswap::edge_swap_device_vecs(
                             H2t1_vec2z = coordInfoVecs.nodeLocZ[coordInfoVecs.triangles2Nodes_3[H2t1]] - coordInfoVecs.nodeLocZ[coordInfoVecs.triangles2Nodes_1[H2t1]];
 							//std::cout<<"H2t2 = H0"<<std::endl;
                             }
-            unsigned T1t1 = coordInfoVecs.edges2Triangles_1[T1];
-            unsigned T1t2 = coordInfoVecs.edges2Triangles_2[T1];
+            int T1t1 = coordInfoVecs.edges2Triangles_1[T1];
+            int T1t2 = coordInfoVecs.edges2Triangles_2[T1];
             if (T1t1 == T0){//In this case T1t1 turns into H0.
                             T1t1_vec1x = coordInfoVecs.nodeLocX[HEAD] - coordInfoVecs.nodeLocX[TAIL];
                             T1t1_vec1y = coordInfoVecs.nodeLocY[HEAD] - coordInfoVecs.nodeLocY[TAIL];
@@ -526,8 +593,8 @@ int Edgeswap::edge_swap_device_vecs(
                             T1t1_vec2z = coordInfoVecs.nodeLocZ[coordInfoVecs.triangles2Nodes_3[T1t1]] - coordInfoVecs.nodeLocZ[coordInfoVecs.triangles2Nodes_1[T1t1]];
 							//std::cout<<"T1t2 = T0"<<std::endl;
                             }
-            unsigned T2t1 = coordInfoVecs.edges2Triangles_1[T2];
-            unsigned T2t2 = coordInfoVecs.edges2Triangles_2[T2];
+            int T2t1 = coordInfoVecs.edges2Triangles_1[T2];
+            int T2t2 = coordInfoVecs.edges2Triangles_2[T2];
             if (T2t1 == T0){T2t1_vec1x = coordInfoVecs.nodeLocX[edge_end] - coordInfoVecs.nodeLocX[TAIL];
                             T2t1_vec1y = coordInfoVecs.nodeLocY[edge_end] - coordInfoVecs.nodeLocY[TAIL];
                             T2t1_vec1z = coordInfoVecs.nodeLocZ[edge_end] - coordInfoVecs.nodeLocZ[TAIL];
@@ -578,7 +645,7 @@ int Edgeswap::edge_swap_device_vecs(
 			(DISTANCE - generalParams.Rmin);
         }*/
         //else{
-            linear_1 = (linearSpringInfoVecs.spring_constant/2)*(DISTANCE - generalParams.Rmin)*
+            linear_1 = (linearSpringInfoVecs.spring_constant/2.0)*(DISTANCE - generalParams.Rmin)*
 			(DISTANCE - generalParams.Rmin);
         //}
         
@@ -597,7 +664,13 @@ int Edgeswap::edge_swap_device_vecs(
     
             double N1_vec1x, N1_vec1y, N1_vec1z, N1_vec2x, N1_vec2y, N1_vec2z, N2_vec1x, N2_vec1y, N2_vec1z, N2_vec2x, N2_vec2y, N2_vec2z;
             bool THIS_SHOULD_NOT_HAPPEN = false;
-            for (unsigned j = 0; j < 5; j++){
+            for (int j = 0; j < 5; j++){
+                if (generalParams.edges_in_upperhem[edges_iteration[j]] == 1){
+                    bend_spring_constant = bendingTriangleInfoVecs.spring_constant_weak;
+                }
+                else{
+                    bend_spring_constant = bendingTriangleInfoVecs.spring_constant;
+                }
                     if (j == 0){
                         N1_vec1x = coordInfoVecs.nodeLocX[HEAD] - coordInfoVecs.nodeLocX[TAIL];//x component of the 1st vector to calculate N1
                         N1_vec1y = coordInfoVecs.nodeLocY[HEAD] - coordInfoVecs.nodeLocY[TAIL];
@@ -611,6 +684,13 @@ int Edgeswap::edge_swap_device_vecs(
                         N2_vec2x = coordInfoVecs.nodeLocX[HEAD] - coordInfoVecs.nodeLocX[TAIL];
                         N2_vec2y = coordInfoVecs.nodeLocY[HEAD] - coordInfoVecs.nodeLocY[TAIL];
                         N2_vec2z = coordInfoVecs.nodeLocZ[HEAD] - coordInfoVecs.nodeLocZ[TAIL];
+
+                        P0x_vol1 = coordInfoVecs.nodeLocX[HEAD];
+                        P0y_vol1 = coordInfoVecs.nodeLocY[HEAD];
+                        P0z_vol1 = coordInfoVecs.nodeLocZ[HEAD];
+                        P0x_vol2 = coordInfoVecs.nodeLocX[HEAD];
+                        P0y_vol2 = coordInfoVecs.nodeLocY[HEAD];
+                        P0z_vol2 = coordInfoVecs.nodeLocZ[HEAD];
                     }
                     else if (j == 1){
                         N1_vec1x = H1t1_vec1x;
@@ -683,6 +763,15 @@ int Edgeswap::edge_swap_device_vecs(
                     double nN2 = sqrt(pow(N2[0],2)+pow(N2[1],2)+pow(N2[2],2));;
 					//std::cout<<"newnN2 = "<<nN2<<std::endl;
 
+                    if (j == 0){
+                        N1x_vol = N1[0]/nN1;
+                        N1y_vol = N1[1]/nN1;
+                        N1z_vol = N1[2]/nN1;
+                        N2x_vol = N2[0]/nN2;
+                        N2y_vol = N2[1]/nN2;
+                        N2z_vol = N2[2]/nN2;
+                    }
+
                     double cosAngle = (N1[0]*N2[0] + N1[1]*N2[1] + N1[2]*N2[2])/(nN1*nN2);
 					//std::cout<<"cosAngle = "<<cosAngle<<std::endl;
                     
@@ -698,22 +787,22 @@ int Edgeswap::edge_swap_device_vecs(
 
                     double theta_current = acos( cosAngle );
                     
-                    double local_energy = bendingTriangleInfoVecs.spring_constant * (1 - cos(theta_current - bendingTriangleInfoVecs.initial_angle) );
+                    double local_energy = bend_spring_constant * (1 - cos(theta_current - bendingTriangleInfoVecs.initial_angle) );
                     temp_bend = temp_bend + local_energy;
 					//std::cout<<"bending energy "<<local_energy<<std::endl;
-					/*for (unsigned COUNT = 0; COUNT < 3; COUNT++){
+					/*for (int COUNT = 0; COUNT < 3; COUNT++){
 					std::cout<<"unit normal 1 = "<<N1[COUNT]<<std::endl;
 					std::cout<<"unit normal 2 = "<<N2[COUNT]<<std::endl;}
 					std::cout<<"angle "<<theta_current<<std::endl;*/
                 }
             double bend_1 = temp_bend;
 
-            unsigned H0n1 = HEAD;
-            unsigned H0n2 = edge_start;
-            unsigned H0n3 = TAIL;
-            unsigned T0n1 = TAIL;
-            unsigned T0n2 = edge_end;
-            unsigned T0n3 = HEAD;
+            int H0n1 = HEAD;
+            int H0n2 = edge_start;
+            int H0n3 = TAIL;
+            int T0n1 = TAIL;
+            int T0n2 = edge_end;
+            int T0n3 = HEAD;
             double a = sqrt(pow((coordInfoVecs.nodeLocX[H0n2] - coordInfoVecs.nodeLocX[H0n1]),2.0) + 
                     pow((coordInfoVecs.nodeLocY[H0n2] - coordInfoVecs.nodeLocY[H0n1]),2.0) +
                     pow((coordInfoVecs.nodeLocZ[H0n2] - coordInfoVecs.nodeLocZ[H0n1]),2.0)
@@ -739,12 +828,30 @@ int Edgeswap::edge_swap_device_vecs(
                         pow((coordInfoVecs.nodeLocY[T0n3] - coordInfoVecs.nodeLocY[T0n2]),2.0) +
                         pow((coordInfoVecs.nodeLocZ[T0n3] - coordInfoVecs.nodeLocZ[T0n2]),2.0)
                         );
-            double mean_def = (d + e + f)/2;
+            double mean_def = (d + e + f)/2.0;
+            if (generalParams.triangles_in_upperhem[H0] == 1){
+                area_spring_constant_1 = areaTriangleInfoVecs.spring_constant_weak;
+            }
+            else{
+                area_spring_constant_1 = areaTriangleInfoVecs.spring_constant;
+            }
+            if (generalParams.triangles_in_upperhem[T0] == 1){
+                area_spring_constant_2 = areaTriangleInfoVecs.spring_constant_weak;
+            }
+            else{
+                area_spring_constant_2 = areaTriangleInfoVecs.spring_constant;
+            }
             double area_H0 = sqrt(mean_abc*(mean_abc - a)*(mean_abc - b)*(mean_abc - c));
             double area_T0 = sqrt(mean_def*(mean_def - d)*(mean_def - e)*(mean_def - f));
-            double area_1_energy = areaTriangleInfoVecs.spring_constant*pow((area_H0 - areaTriangleInfoVecs.initial_area),2.0)/(2*areaTriangleInfoVecs.initial_area) +
-                                areaTriangleInfoVecs.spring_constant*pow((area_T0 - areaTriangleInfoVecs.initial_area),2.0)/(2*areaTriangleInfoVecs.initial_area);
-            double E_1 = linear_1 + bend_1 + area_1_energy;
+            double area_1_energy = area_spring_constant_1*pow((area_H0 - areaTriangleInfoVecs.initial_area),2.0)/(2*areaTriangleInfoVecs.initial_area) +
+                                area_spring_constant_2*pow((area_T0 - areaTriangleInfoVecs.initial_area),2.0)/(2*areaTriangleInfoVecs.initial_area);
+            double vol_H0 = (1.0/3.0)*(P0x_vol1*N1x_vol + P0y_vol1*N1y_vol + P0z_vol1*N1z_vol)*area_H0;
+            double vol_T0 = (1.0/3.0)*(P0x_vol2*N2x_vol + P0y_vol2*N2y_vol + P0z_vol2*N2z_vol)*area_T0;
+            vol_1 = vol_H0 + vol_T0;
+            double new_vol = generalParams.true_current_total_volume + (vol_1 - vol_0);
+            double new_vol_energy = generalParams.volume_spring_constant*(new_vol - generalParams.eq_total_volume)*(new_vol - generalParams.eq_total_volume)/
+                                    (2.0*generalParams.Rmin*generalParams.Rmin*generalParams.Rmin*generalParams.eq_total_volume);
+            double E_1 = linear_1 + bend_1 + area_1_energy + new_vol_energy;
 			/*std::cout<<"new linear energy = "<<linear_1<<std::endl;
 			std::cout<<"new bend energy = "<<bend_1<<std::endl;
 			std::cout<<"new area energy = "<<area_1_energy<<std::endl;
@@ -815,7 +922,7 @@ int Edgeswap::edge_swap_device_vecs(
             ////////////////////////////////////////////////////////////////////////////////////
 
             ///////// DELETING CONNECTIVITY BETWEEN EDGE_START AND EDGE_END ////////////////////
-            unsigned data_id;
+            int data_id;
             if (coordInfoVecs.nndata1[edge_start] == edge_end){
                 //data_id = 0;
                 coordInfoVecs.nndata1[edge_start] = -2;

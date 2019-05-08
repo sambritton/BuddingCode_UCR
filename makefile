@@ -47,7 +47,7 @@ NVCCFLAGS= -std=c++11
 virus-model: $(OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: NVCC C++ Linker'
-	nvcc  $(ILIBS_cuda9) $(LIBS)  $(OBJS) $(NVCCFLAGS) -o "virus-model"  
+	nvcc  $(ILIBS1) $(LIBS)  $(OBJS) $(NVCCFLAGS) -o "virus-model"  
 	@echo 'Finished building target: $@'
 	@echo ' ' 
 	$(MAKE) --no-print-directory post-build 

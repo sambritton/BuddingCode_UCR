@@ -16,7 +16,8 @@ void AdvanceLJParticle(
 struct LJSpringFunctor {
     double Rcutoff;
     double Rmin;
-    double epsilon;
+    double epsilon_rep1;
+    double epsilon_rep2;
 
     double LJLocX;
     double LJLocY;
@@ -33,7 +34,8 @@ struct LJSpringFunctor {
 	__host__ __device__ LJSpringFunctor(
         double& _Rcutoff,
         double& _Rmin,
-        double& _epsilon,
+        double& _epsilon_rep1,
+        double& _epsilon_rep2,
 
         double& _LJLocX,
         double& _LJLocY,
@@ -49,7 +51,8 @@ struct LJSpringFunctor {
 
         Rcutoff(_Rcutoff),
         Rmin(_Rmin),
-        epsilon(_epsilon),
+        epsilon_rep1(_epsilon_rep1),
+        epsilon_rep2(_epsilon_rep2),
 
         LJLocX(_LJLocX),
         LJLocY(_LJLocY),
@@ -64,7 +67,7 @@ struct LJSpringFunctor {
         forceZAddr(_forceZAddr) {}
 
 	//hand in counting iterator and id of two edges and preferred length
-	__device__ CVec4 operator()(const unsigned & id) {
+	__device__ CVec4 operator()(const int & id) {
         		
         // compute forces
         double xLoc = locXAddr[id];
@@ -81,26 +84,32 @@ struct LJSpringFunctor {
         double forceY=0.0;
         double forceZ=0.0;
         double energy = 0.0;
-        if (R < Rcutoff) {
-            //double mag = 50*(R-4.0);
-            forceX = //mag*((LJLocX - xLoc));
-            epsilon * (-12.0 * pow(Rmin, 12.0) * (LJLocX - xLoc)/pow(R, 14.0) + 
-                            12 * pow(Rmin, 6.0)  * (LJLocX - xLoc)/pow(R, 8.0) );
+        if (R < Rmin) {
+            
+            double magnitude = 2*epsilon_rep1*
+                                        (1-exp(-epsilon_rep2*(R-Rmin)))*
+                                        (-exp(-epsilon_rep2*(R-Rmin)))*
+                                        (epsilon_rep2/R);
 
-            forceY = //mag*(LJLocY - yLoc);
-            epsilon * (-12.0 * pow(Rmin, 12.0) * (LJLocY - yLoc)/pow(R, 14.0) + 
-                            12.0 * pow(Rmin, 6.0) * (LJLocY - yLoc)/pow(R, 8.0) );
+                    forceX = -magnitude*(LJLocX - xLoc);//xLoc_LR;
+                    forceY = -magnitude*(LJLocY - yLoc);//yLoc_LR;
+                    forceZ = -magnitude*(LJLocZ - zLoc);//zLoc_LR;
 
-            forceZ = //mag*(LJLocZ - zLoc);
-            epsilon * (-12.0 * pow(Rmin, 12.0)  * (LJLocZ - zLoc)/pow(R, 14.0) + 
-                            12.0 * pow(Rmin, 6.0) * (LJLocZ - zLoc)/pow(R, 8.0) );
+            //forceX = epsilon * (-6.0 * pow(Rmin, 6.0) * (LJLocX - xLoc)/pow(R, 8.0) + 
+            //                3.0 * pow(Rmin, 3.0)  * (LJLocX - xLoc)/pow(R, 5.0) );
+
+            //forceY = epsilon * (-6.0 * pow(Rmin, 6.0) * (LJLocY - yLoc)/pow(R, 8.0) + 
+            //                3.0 * pow(Rmin, 3.0) * (LJLocY - yLoc)/pow(R, 5.0) );
+
+            //forceZ = epsilon * (-6.0 * pow(Rmin, 6.0) * (LJLocZ - zLoc)/pow(R, 8.0) + 
+            //                3.0 * pow(Rmin, 3.0) * (LJLocZ - zLoc)/pow(R, 5.0) );
 
             //WARNING: since this function modifies nodeForceX etc, you cannot rewrite entries. 
             forceXAddr[id] += forceX;
             forceYAddr[id] += forceY;
             forceZAddr[id] += forceZ;
             //energy = epsilon + epsilon * (pow( Rmin/R, 12.0 ) - 2.0 * pow( Rmin / R, 6.0));//force positivity
-            energy = epsilon * (pow( Rmin/R, 12.0 ) - 2.0 * pow( Rmin / R, 6.0));
+            energy = epsilon_rep1 * (1-exp(-epsilon_rep2*(R - Rmin))) * (1-exp(-epsilon_rep2*(R - Rmin)));
         }
 
         

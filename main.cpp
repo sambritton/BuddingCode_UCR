@@ -1,5 +1,3 @@
-
-
 #include <iomanip>
 #include <string>
 #include <memory>
@@ -101,6 +99,7 @@ std::shared_ptr<System> createSystem(const char* schemeFile, std::shared_ptr<Sys
 		std::cout<<"Setting lj z: "<< builder->defaultLJ_Z << std::endl;
 	}
 
+
 	if (auto p = props.child("edge_eq")){
 		builder->defaultEdgeEq = (p.text().as_double());
 		std::cout<<"Setting edge equilibrium: "<< builder->defaultEdgeEq << std::endl;
@@ -131,7 +130,7 @@ std::shared_ptr<System> createSystem(const char* schemeFile, std::shared_ptr<Sys
 	}
 	
 	//add edges
-	unsigned from, to;	
+	int from, to;	
 	for (auto edge = edges.child("edgeinfo"); edge; edge = edge.next_sibling("edgeinfo")) {
 	//	if (builder->defaultEdgeEq != 0.0) {
 			if (2 != sscanf(edge.text().as_string(""), "%u %u" , &from, &to)) {
@@ -151,9 +150,9 @@ std::shared_ptr<System> createSystem(const char* schemeFile, std::shared_ptr<Sys
 			builder->addEdge(from-1, to-1); //adds edges into saved vectors, calculates length. 
 		}*/
 	}
-	
+//	std::cout<<"Error1"<<std::endl;
 	//add triangles
-	unsigned E1, E2, E3, E4, E5, E6, E7, E8, E9, E10, E11, E12;	
+	int E1, E2, E3, E4, E5, E6, E7, E8, E9, E10, E11, E12;	
 	for (auto elem = elems.child("elem"); elem; elem = elem.next_sibling("elem")) {
 		if (3 != sscanf(elem.text().as_string(""), "%u %u %u" , &E1, &E2, &E3)) {
 			std::cout << "parse elem error\n";
@@ -162,7 +161,7 @@ std::shared_ptr<System> createSystem(const char* schemeFile, std::shared_ptr<Sys
 		//std::cout << "putting spring between: " << from << ' ' <<to<<  std::endl;
 		builder->addElement(E1-1, E2-1, E3-1); //adds edges into saved vectors
 	}
-
+//std::cout<<"Error2"<<std::endl;
 	//add indices of edges in each element
 	for (auto elem2edge = elem2edges.child("elem2edge"); elem2edge; elem2edge = elem2edge.next_sibling("elem2edge")) {
 		if (3 != sscanf(elem2edge.text().as_string(""), "%u %u %u" , &E1, &E2, &E3)) {
@@ -172,17 +171,17 @@ std::shared_ptr<System> createSystem(const char* schemeFile, std::shared_ptr<Sys
 		//std::cout << "putting spring between: " << from << ' ' <<to<<  std::endl;
 		builder->addElement2Edge(E1-1, E2-1, E3-1); //adds edges into saved vectors
 	}
-
+//std::cout<<"Error3"<<std::endl;
 	//add indices of nndata (neighboring nodes of node "i")
 	for (auto nndata = nndatas.child("nndata"); nndata; nndata = nndata.next_sibling("nndata")) {
-		if (3 != sscanf(nndata.text().as_string(""), "%u %u %u %u %u %u %u %u %u %u %u %u" , &E1, &E2, &E3, &E4, &E5, &E6, &E7, &E8, &E9, &E10, &E11, &E12)) {
+		if (12 != sscanf(nndata.text().as_string(""), "%u %u %u %u %u %u %u %u %u %u %u %u" , &E1, &E2, &E3, &E4, &E5, &E6, &E7, &E8, &E9, &E10, &E11, &E12)) {
 			std::cout << "parse nndata error\n";
 			return 0;
 		}
 		//std::cout << "putting spring between: " << from << ' ' <<to<<  std::endl;
 		builder->addNndata(E1-1, E2-1, E3-1, E4-1, E5-1, E6-1, E7-1, E8-1, E9-1, E10-1, E11-1, E12-1); //adds edges into saved vectors
 	}
-	
+//	std::cout<<"Error4"<<std::endl;
 	//add indices of elems in each edge
 	for (auto edge2elem = edge2elems.child("edge2elem"); edge2elem; edge2elem = edge2elem.next_sibling("edge2elem")) {
 		if (2 != sscanf(edge2elem.text().as_string(""), "%u %u" , &E1, &E2)) {
@@ -192,7 +191,7 @@ std::shared_ptr<System> createSystem(const char* schemeFile, std::shared_ptr<Sys
 		//std::cout << "putting spring between: " << from << ' ' <<to<<  std::endl;
 		builder->addEdge2Elem(E1-1, E2-1); //adds edges into saved vectors
 	}
-
+//std::cout<<"Error5"<<std::endl;
 	//add indices of capsid nodes
 	for (auto capsidnode = capsidnodes.child("capsidnode"); capsidnode; capsidnode = capsidnode.next_sibling("capsidnode")) {
 
@@ -206,7 +205,7 @@ std::shared_ptr<System> createSystem(const char* schemeFile, std::shared_ptr<Sys
 		//std::cout << "putting spring between: " << from << ' ' <<to<<  std::endl;
 		builder->addCapsidNode(x,y,z);
 	}
-
+//std::cout<<"Error6"<<std::endl;
 	//add indices of fixed nodes
 	for (auto id = fixnodes.child("fix"); id; id = id.next_sibling("fix")) {
 		if (1 != sscanf(id.text().as_string(""), "%u" , &E1)) {
@@ -218,7 +217,7 @@ std::shared_ptr<System> createSystem(const char* schemeFile, std::shared_ptr<Sys
 	};
 
 
-
+//std::cout<<"Error7"<<std::endl;
 
 	//set system variables
 	std::shared_ptr<System> virus_system = builder->createSystem();
@@ -250,13 +249,13 @@ void run(int argc, char** argv) {
 
 	double forceStep = 0.0;
 	double timestep = 0.001;
-	unsigned solve_time = 10000;
+	int solve_time = 10000;
 	bool time_found = false;
 
 	for (int i = -1; i < argc-1; i++) {
 
 		std::string arg = argv[i];
-		unsigned pos = arg.find('=');
+		int pos = arg.find('=');
 
 		std::string key = arg.substr(0, pos);
 		std::string val = arg.substr(pos + 1);

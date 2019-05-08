@@ -20,7 +20,7 @@ class SystemBuilder {
 public:
 	//set by constructor using command line
 	double dt;
-	unsigned solve_time;
+	int solve_time;
 
 	//set by xml input file. 
 	double defaultTau = 1.0; 
@@ -45,7 +45,7 @@ public:
 
 public:
 
-	SystemBuilder(double timestep, unsigned solve_time);
+	SystemBuilder(double timestep, int solve_time);
 	//collection of set up host vectors in SystemStructures.h
 	
 	
@@ -53,17 +53,17 @@ public:
 
 	void addNndata(double x1,double x2, double x3, double x4,double x5, double x6, double x7,double x8, double x9, double x10,double x11, double x12 );
 
-	void addEdge(unsigned idL, unsigned idR );
+	void addEdge(int idL, int idR );
 
-    void addEdge(unsigned idL, unsigned idR, double edge_initial_length);
+    void addEdge(int idL, int idR, double edge_initial_length);
 
- 	void addElement(unsigned idA, unsigned idB, unsigned idC );
+ 	void addElement(int idA, int idB, int idC );
  	
-	void addElement2Edge(unsigned idA, unsigned idB, unsigned idC );
+	void addElement2Edge(int idA, int idB, int idC );
  
-	void addEdge2Elem(unsigned idA, unsigned idB );
+	void addEdge2Elem(int idA, int idB );
 
-	void fixNodes(unsigned id);
+	void fixNodes(int id);
 	
 	void addCapsidNode(double x, double y, double z);
 	//void setSystemForParallelComputation();

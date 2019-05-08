@@ -8,7 +8,7 @@
 #include "SystemStructures.h"
 # define M_PI 3.14159265358979323846  /* pi */
 
-SystemBuilder::SystemBuilder(double timestep_, unsigned solve_time_){
+SystemBuilder::SystemBuilder(double timestep_, int solve_time_){
 	dt = timestep_;
 	solve_time = solve_time_;
 };
@@ -41,7 +41,7 @@ void SystemBuilder::addNndata(double x1,double x2, double x3, double x4,double x
 	//std::cout<<"adding node: "<< x << " " << y << " "<< z <<  std::endl;
 }
 
-void SystemBuilder::addEdge(unsigned idL, unsigned idR ) {
+void SystemBuilder::addEdge(int idL, int idR ) {
 	hostSetInfoVecs.edges2Nodes_1.push_back(idL);
 	hostSetInfoVecs.edges2Nodes_2.push_back(idR);
 
@@ -56,7 +56,7 @@ void SystemBuilder::addEdge(unsigned idL, unsigned idR ) {
 	hostSetInfoVecs.edge_initial_length.push_back(dist);
 	//std::cout<<"adding edge with calc dist: "<< idL << " " << idR << " dist: "<< dist<< std::endl;
 }
-void SystemBuilder::addEdge(unsigned idL, unsigned idR, double edge_initial_length) {
+void SystemBuilder::addEdge(int idL, int idR, double edge_initial_length) {
 	
 	hostSetInfoVecs.edges2Nodes_1.push_back(idL);
 	hostSetInfoVecs.edges2Nodes_2.push_back(idR);
@@ -65,26 +65,26 @@ void SystemBuilder::addEdge(unsigned idL, unsigned idR, double edge_initial_leng
 	
 	//std::cout<<"adding edge with fixed dist: "<< idL << " " << idR << " dist: "<< edge_initial_length<< std::endl;
 }
-void SystemBuilder::addElement(unsigned idA, unsigned idB, unsigned idC ) {
+void SystemBuilder::addElement(int idA, int idB, int idC ) {
 	hostSetInfoVecs.triangles2Nodes_1.push_back(idA);
 	hostSetInfoVecs.triangles2Nodes_2.push_back(idB);	
 	hostSetInfoVecs.triangles2Nodes_3.push_back(idC);
 	
 }
 
-void SystemBuilder::addElement2Edge(unsigned idA, unsigned idB, unsigned idC ) {
+void SystemBuilder::addElement2Edge(int idA, int idB, int idC ) {
 	hostSetInfoVecs.triangles2Edges_1.push_back(idA);
 	hostSetInfoVecs.triangles2Edges_2.push_back(idB);	
 	hostSetInfoVecs.triangles2Edges_3.push_back(idC);
 	
 }
 
-void SystemBuilder::addEdge2Elem(unsigned idA, unsigned idB ) {
+void SystemBuilder::addEdge2Elem(int idA, int idB ) {
 	hostSetInfoVecs.edges2Triangles_1.push_back(idA);
 	hostSetInfoVecs.edges2Triangles_2.push_back(idB);	
 }
 
-void SystemBuilder::fixNodes(unsigned id){
+void SystemBuilder::fixNodes(int id){
 	hostSetInfoVecs.isNodeFixed[id] = true;
 	//std::cout<<"fixing node "<< id << std::endl;
 }
@@ -108,7 +108,7 @@ std::shared_ptr<System> SystemBuilder::createSystem() {
 
 	//set individual parameters
 	host_ptr_System->generalParams.dt = dt;
-	host_ptr_System->generalParams.solve_time = solve_time;//unsigned
+	host_ptr_System->generalParams.solve_time = solve_time;//int
 	host_ptr_System->generalParams.tau = defaultTau; 
 	host_ptr_System->generalParams.kT = defaultKBT;
 
@@ -116,9 +116,9 @@ std::shared_ptr<System> SystemBuilder::createSystem() {
 	host_ptr_System->areaTriangleInfoVecs.spring_constant = defaultArea_Const;
 	host_ptr_System->bendingTriangleInfoVecs.spring_constant = defaultBending_Const;
 
-	host_ptr_System->ljInfoVecs.epsilon = defaultLJ_Eps;
-	host_ptr_System->ljInfoVecs.Rmin = defaultLJ_Rmin;
-	host_ptr_System->ljInfoVecs.Rcutoff = defaultLJ_Rmax;
+	host_ptr_System->ljInfoVecs.epsilon_M = defaultLJ_Eps;
+	host_ptr_System->ljInfoVecs.Rmin_M = defaultLJ_Rmin;
+	host_ptr_System->ljInfoVecs.Rcutoff_M = defaultLJ_Rmax;
 	host_ptr_System->ljInfoVecs.spring_constant = defaultLJ_Const;
 	host_ptr_System->ljInfoVecs.LJ_PosX = defaultLJ_X;
 	host_ptr_System->ljInfoVecs.LJ_PosY = defaultLJ_Y;

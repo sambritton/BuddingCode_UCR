@@ -10,14 +10,14 @@ void ComputeCapsideSpringsAll(
     CapsidInfoVecs& capsidInfoVecs,
     AuxVecs& auxVecs) {
 
-    unsigned factor = 15;//number of interactions a single capside point can have.
+    int factor = 15;//number of interactions a single capside point can have.
     //use these as reduced vectors.    
     
     capsidInfoVecs.tempCapsideId.resize(factor * capsidInfoVecs.maxNodeCount);
     capsidInfoVecs.tempMembraneId.resize(factor * capsidInfoVecs.maxNodeCount);
 
-    thrust::device_vector<unsigned> tempMembraneIdReduced;
-    thrust::device_vector<unsigned> tempCapsidIdReduced;
+    thrust::device_vector<int> tempMembraneIdReduced;
+    thrust::device_vector<int> tempCapsidIdReduced;
     thrust::device_vector<double> tempNodeForceXReduced;
     thrust::device_vector<double> tempNodeForceYReduced;
     thrust::device_vector<double> tempNodeForceZReduced;
@@ -30,8 +30,8 @@ void ComputeCapsideSpringsAll(
 
 
 
-    thrust::device_vector<unsigned> tempMembraneIdUnreduced;
-    thrust::device_vector<unsigned> tempCapsidIdUnreduced;
+    thrust::device_vector<int> tempMembraneIdUnreduced;
+    thrust::device_vector<int> tempCapsidIdUnreduced;
     thrust::device_vector<double> tempNodeForceXUnreduced;
     thrust::device_vector<double> tempNodeForceYUnreduced;
     thrust::device_vector<double> tempNodeForceZUnreduced;
@@ -44,7 +44,7 @@ void ComputeCapsideSpringsAll(
     thrust::fill(tempMembraneIdUnreduced.begin(),tempMembraneIdUnreduced.end(), generalParams.maxNodeCount);
 
     
-    thrust::counting_iterator<unsigned> begin(0);
+    thrust::counting_iterator<int> begin(0);
     //for each capsid node, choose the closest membrane node. 
     //what if I chose the closest capsid node for each membrane node?
     thrust::for_each(  
@@ -89,7 +89,7 @@ void ComputeCapsideSpringsAll(
             tempMembraneIdUnreduced.begin(),
             tempNodeForceXUnreduced.begin(),
             tempNodeForceYUnreduced.begin(),
-            tempNodeForceZUnreduced.begin())), thrust::less<unsigned>());	
+            tempNodeForceZUnreduced.begin())), thrust::less<int>());	
 
     //stable sort by membrane for reduciton prep
     thrust::stable_sort_by_key(tempMembraneIdUnreduced.begin(), tempMembraneIdUnreduced.end(),
@@ -98,7 +98,7 @@ void ComputeCapsideSpringsAll(
             tempCapsidIdUnreduced.begin(),
             tempNodeForceXUnreduced.begin(),
             tempNodeForceYUnreduced.begin(),
-            tempNodeForceZUnreduced.begin())), thrust::less<unsigned>());
+            tempNodeForceZUnreduced.begin())), thrust::less<int>());
     
     //to image, we need the corresponding id's of edges. 
     //copy these to tempCapsidId and tempMembraneId
@@ -112,7 +112,7 @@ void ComputeCapsideSpringsAll(
     
 
     //Reduce and apply force
-    unsigned endKey = thrust::get<0>(
+    int endKey = thrust::get<0>(
        thrust::reduce_by_key(
             tempMembraneIdUnreduced.begin(), 
             tempMembraneIdUnreduced.end(),
@@ -127,7 +127,7 @@ void ComputeCapsideSpringsAll(
                tempNodeForceXReduced.begin(),
                tempNodeForceYReduced.begin(),
                tempNodeForceZReduced.begin())),
-       thrust::equal_to<unsigned>(), CVec3Add())) - tempMembraneIdReduced.begin();//binary_pred, binary_op 
+       thrust::equal_to<int>(), CVec3Add())) - tempMembraneIdReduced.begin();//binary_pred, binary_op 
 
 
     
@@ -153,7 +153,7 @@ void ComputeCapsideSpringsAll(
             thrust::raw_pointer_cast(coordInfoVecs.nodeForceZ.data())));
 
    /* if (generalParams.iteration %10000 == 0) {
-        for (unsigned i = 0; i < endKey; i++){
+        for (int i = 0; i < endKey; i++){
             std::cout<< "post add " <<" cap Id: "<< capsidInfoVecs.tempCapsideId[i]<< " << mem Id: "<< capsidInfoVecs.tempMembraneId[i]<< " "<< capsidInfoVecs.tempNodeForceX[i] << " "<<capsidInfoVecs.tempNodeForceY[i] << " "<<capsidInfoVecs.tempNodeForceZ[i] << std::endl;
             std::cout<<"dist: "<< capsidInfoVecs.tempLengthsPairs[i]<< std::endl;
         }

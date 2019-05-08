@@ -10,8 +10,8 @@ double ComputeLinearSpringsEnergy(
     LJInfoVecs& ljInfoVecs) {
 
     
-        thrust::counting_iterator<unsigned> edgeIdBegin(0);
-        thrust::counting_iterator<unsigned> edgeIdEnd(coordInfoVecs.num_edges);
+        thrust::counting_iterator<int> edgeIdBegin(0);
+        thrust::counting_iterator<int> edgeIdEnd(coordInfoVecs.num_edges);
 
 
     linearSpringInfoVecs.linear_spring_energy=

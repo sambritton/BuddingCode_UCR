@@ -7,7 +7,7 @@ double ComputeAreaTrianglesEnergy(
     CoordInfoVecs& coordInfoVecs,
     AreaTriangleInfoVecs& areaTriangleInfoVecs) {
 
-        thrust::counting_iterator<unsigned> elemId(0);
+        thrust::counting_iterator<int> elemId(0);
     
         
         areaTriangleInfoVecs.area_triangle_energy = thrust::transform_reduce( 

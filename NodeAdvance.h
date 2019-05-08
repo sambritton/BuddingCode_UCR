@@ -15,7 +15,7 @@ void AdvancePositions(
 struct SaxpyFunctorPrimary : public thrust::binary_function<BoolCVec3, CVec3, CVec3> {
 	double dt;
 	double mass;
-	unsigned maxNodeCount;
+	int maxNodeCount;
 	double domainLengthX;
 	double domainLengthY;
 	double domainLengthZ;
@@ -25,7 +25,7 @@ struct SaxpyFunctorPrimary : public thrust::binary_function<BoolCVec3, CVec3, CV
 		SaxpyFunctorPrimary(
 			double& _dt, 
 			double& _mass,
-			unsigned& _maxNodeCount,
+			int& _maxNodeCount,
 			double& _domainLengthX,
 			double& _domainLengthY,
 			double& _domainLengthZ) :

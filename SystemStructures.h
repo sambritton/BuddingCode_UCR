@@ -34,32 +34,32 @@
 #include <thrust/sequence.h>
 
 
-typedef thrust::tuple<unsigned, bool, double> Tubd;
-typedef thrust::tuple<unsigned, bool> Tub;
-typedef thrust::tuple<unsigned, double> Tud;
+typedef thrust::tuple<int, bool, double> Tubd;
+typedef thrust::tuple<int, bool> Tub;
+typedef thrust::tuple<int, double> Tud;
 typedef thrust::tuple<bool, double> Tbd;
 
 
-typedef thrust::tuple<unsigned, unsigned, double> Tuud;
+typedef thrust::tuple<int, int, double> Tuud;
 
-typedef thrust::tuple<unsigned, unsigned, unsigned, unsigned, double> Tuuuud;
-typedef thrust::tuple<unsigned, unsigned, unsigned,unsigned, unsigned> Tuuuuu;
-typedef thrust::tuple<unsigned, unsigned, unsigned,unsigned> Tuuuu;
-typedef thrust::tuple<unsigned, unsigned, unsigned, double> Tuuud;
-typedef thrust::tuple<unsigned, unsigned, unsigned> Tuuu;
-typedef thrust::tuple<unsigned, unsigned> Tuu;
+typedef thrust::tuple<int, int, int, int, double> Tuuuud;
+typedef thrust::tuple<int, int, int,int, int> Tuuuuu;
+typedef thrust::tuple<int, int, int,int> Tuuuu;
+typedef thrust::tuple<int, int, int, double> Tuuud;
+typedef thrust::tuple<int, int, int> Tuuu;
+typedef thrust::tuple<int, int> Tuu;
 
-typedef thrust::tuple<unsigned, double, double, double> Tuddd;
-typedef thrust::tuple<double, double, double, unsigned> Tdddu;
+typedef thrust::tuple<int, double, double, double> Tuddd;
+typedef thrust::tuple<double, double, double, int> Tdddu;
 typedef thrust::tuple<double, double> Tdd;
 
 typedef thrust::tuple<bool, double, double, double, double, double, double> BoolCVec6;
-typedef thrust::tuple<unsigned, double, double, double, double, double, double,double, double, double> UCVec9;
+typedef thrust::tuple<int, double, double, double, double, double, double,double, double, double> UCVec9;
 
-typedef thrust::tuple<unsigned, double, double, double, double, double, double> UCVec6;
-typedef thrust::tuple<unsigned, unsigned, double, double, double, double> U2CVec4;
-typedef thrust::tuple<unsigned, unsigned, double, double, double> U2CVec3;
-typedef thrust::tuple<unsigned, double, double, double> UCVec3;
+typedef thrust::tuple<int, double, double, double, double, double, double> UCVec6;
+typedef thrust::tuple<int, int, double, double, double, double> U2CVec4;
+typedef thrust::tuple<int, int, double, double, double> U2CVec3;
+typedef thrust::tuple<int, double, double, double> UCVec3;
 typedef thrust::tuple<bool, double, double, double> BoolCVec3;
 
 typedef thrust::tuple<double, double, double, double, double, double, double, double, double> CVec9;
@@ -115,23 +115,23 @@ struct HostSetInfoVecs {
 	
 	//LOCAL COORDS
 	//indices of each triangle
-	thrust::host_vector<unsigned> triangles2Nodes_1;
-	thrust::host_vector<unsigned> triangles2Nodes_2;
-	thrust::host_vector<unsigned> triangles2Nodes_3;
+	thrust::host_vector<int> triangles2Nodes_1;
+	thrust::host_vector<int> triangles2Nodes_2;
+	thrust::host_vector<int> triangles2Nodes_3;
 
 	
 	//indices of each edge
-	thrust::host_vector<unsigned> edges2Nodes_1;
-	thrust::host_vector<unsigned> edges2Nodes_2;
+	thrust::host_vector<int> edges2Nodes_1;
+	thrust::host_vector<int> edges2Nodes_2;
 
 	//indices of 2 triangle on each edge
-	thrust::host_vector<unsigned> edges2Triangles_1;
-	thrust::host_vector<unsigned> edges2Triangles_2;
+	thrust::host_vector<int> edges2Triangles_1;
+	thrust::host_vector<int> edges2Triangles_2;
 
 	//indices of edges on each triangle.
-	thrust::host_vector<unsigned> triangles2Edges_1;
-	thrust::host_vector<unsigned> triangles2Edges_2;
-	thrust::host_vector<unsigned> triangles2Edges_3;
+	thrust::host_vector<int> triangles2Edges_1;
+	thrust::host_vector<int> triangles2Edges_2;
+	thrust::host_vector<int> triangles2Edges_3;
 
 	thrust::host_vector<double> edge_initial_length;
 };
@@ -153,7 +153,7 @@ struct AddForceFunctor {
 
 	__device__
 	void operator() (const Tuddd& u1d3) {
-			unsigned idToAssign = thrust::get<0>(u1d3);
+			int idToAssign = thrust::get<0>(u1d3);
 			if (!isnan(thrust::get<1>(u1d3)) && !isnan(thrust::get<2>(u1d3)) && !isnan(thrust::get<3>(u1d3))) {
 
 			forceXAddr[idToAssign] += thrust::get<1>(u1d3);
@@ -166,7 +166,7 @@ struct AddForceFunctor {
 };
 
 struct AddForceFunctorAlt {
-	unsigned maxNodeCount;
+	int maxNodeCount;
 	double* forceXAddr;
 	double* forceYAddr;
 	double* forceZAddr;
@@ -174,7 +174,7 @@ struct AddForceFunctorAlt {
 	__host__ __device__
 	//
 		AddForceFunctorAlt(
-				unsigned& _maxNodeCount,
+				int& _maxNodeCount,
 				double* _forceXAddr,
 				double* _forceYAddr,
 				double* _forceZAddr) :
@@ -185,7 +185,7 @@ struct AddForceFunctorAlt {
 
 	__device__
 	void operator() (const Tuddd& u1d3) {
-		unsigned idToAssign = thrust::get<0>(u1d3);
+		int idToAssign = thrust::get<0>(u1d3);
 		if (idToAssign < maxNodeCount){
 			forceXAddr[idToAssign] += thrust::get<1>(u1d3);
 			forceYAddr[idToAssign] += thrust::get<2>(u1d3);
@@ -264,7 +264,7 @@ struct psrnormgen {
 		a(_a), 
 		b(_b) {}
  
-    __device__ double operator()(const unsigned n) const
+    __device__ double operator()(const int n) const
     {
         thrust::default_random_engine rng(n);
         thrust::normal_distribution<double> dist(a, b);
@@ -284,7 +284,7 @@ struct psrunifgen {
 		a(_a), 
 		b(_b) {}
  
-    __device__ double operator()(const unsigned n) const
+    __device__ double operator()(const int n) const
     {
         thrust::default_random_engine rng(n);
         thrust::uniform_real_distribution<double> dist(a, b);
@@ -310,9 +310,9 @@ struct TorsionAngleFunctor {
 
 	__device__
 	double operator() (const Tuuu &u3) {
-		unsigned indexLeft = thrust::get<0>(u3);
-		unsigned indexCenter = thrust::get<1>(u3);
-		unsigned indexRight = thrust::get<2>(u3);
+		int indexLeft = thrust::get<0>(u3);
+		int indexCenter = thrust::get<1>(u3);
+		int indexRight = thrust::get<2>(u3);
 
 		double distLCX = locXAddr[indexLeft] - locXAddr[indexCenter];
 		double distLCY = locYAddr[indexLeft] - locYAddr[indexCenter];
@@ -413,7 +413,7 @@ struct tupleEqual {
 struct IsEqualToOne {
 
 	__host__ __device__ 
-	bool operator() (const unsigned& x) {
+	bool operator() (const int& x) {
 		return (x != 1);
 	}
 };
@@ -422,7 +422,7 @@ struct IsEqualToOne {
 struct isNotEqualZero {
 
 	__host__ __device__ 
-	bool operator() (const unsigned& x) {
+	bool operator() (const int& x) {
 		return (x != 0);
 	}
 };
@@ -430,18 +430,18 @@ struct isNotEqualZero {
 //return true if equal to input value.
 struct isEqualZero {
 	__host__ __device__ 
-	bool operator() (const unsigned& x) {
+	bool operator() (const int& x) {
 		return (x == 0);
 	}
 };
 
 struct is_greater_than {
-	unsigned limit;
+	int limit;
 
 	 __host__ __device__
-	is_greater_than(unsigned& _limit) : limit(_limit) {}
+	is_greater_than(int& _limit) : limit(_limit) {}
   __device__
-  bool operator()(const unsigned& x) {
+  bool operator()(const int& x) {
 	if ( x > limit ) {
     	return true;
 	}
@@ -451,12 +451,12 @@ struct is_greater_than {
   }
 };
 struct is_less_than {
-	unsigned limit;
+	int limit;
 
 	 __host__ __device__
-	is_less_than(unsigned& _limit) : limit(_limit) {}
+	is_less_than(int& _limit) : limit(_limit) {}
   __device__
-  bool operator()(const unsigned& x) {
+  bool operator()(const int& x) {
 	if ( x < limit ) {
     	return true;
 	}

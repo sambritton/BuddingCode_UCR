@@ -17,8 +17,8 @@ struct CapsidSpringFunctor {
     double length_cutoff;
     double spring_constant;
     double length_zero;
-    unsigned capsidMaxNode;
-    unsigned membraneMaxNode;
+    int capsidMaxNode;
+    int membraneMaxNode;
     
     double* capsidNodeXAddr;
     double* capsidNodeYAddr;
@@ -27,17 +27,17 @@ struct CapsidSpringFunctor {
     double* membraneNodeYAddr;
     double* membraneNodeZAddr;
 
-    unsigned* bucketNbrsExp;
-    unsigned* keyBegin;
-    unsigned* keyEnd;
+    int* bucketNbrsExp;
+    int* keyBegin;
+    int* keyEnd;
     
 	__host__ __device__ 
     CapsidSpringFunctor(  
     double& _length_cutoff,  
     double& _spring_constant,
     double& _length_zero,
-    unsigned& _capsidMaxNode,
-    unsigned& _membraneMaxNode,
+    int& _capsidMaxNode,
+    int& _membraneMaxNode,
     
     double* _capsidNodeXAddr,
     double* _capsidNodeYAddr,
@@ -46,9 +46,9 @@ struct CapsidSpringFunctor {
     double* _membraneNodeYAddr,
     double* _membraneNodeZAddr,
 
-    unsigned* _bucketNbrsExp,
-    unsigned* _keyBegin,
-    unsigned* _keyEnd) :
+    int* _bucketNbrsExp,
+    int* _keyBegin,
+    int* _keyEnd) :
     length_cutoff(_length_cutoff),
     spring_constant(_spring_constant),
     length_zero(_length_zero),
@@ -69,25 +69,25 @@ struct CapsidSpringFunctor {
     //each capside point chooses a single membrane point.
 	__device__
     U2CVec4 operator() (const Tuu& u2) {
-		unsigned bucketId = thrust::get<0>(u2);//bucket containing nodeId
-		unsigned capsidId = thrust::get<1>(u2);//node to attempt link from.
+		int bucketId = thrust::get<0>(u2);//bucket containing nodeId
+		int capsidId = thrust::get<1>(u2);//node to attempt link from.
 	
 		//beginning and end of attempted attachment id's in bucketNbrsExp
         //these indices are membrane
-		unsigned beginIndex = keyBegin[bucketId];
-		unsigned endIndex = keyEnd[bucketId];
+		int beginIndex = keyBegin[bucketId];
+		int endIndex = keyEnd[bucketId];
 
         double xLoc_LR;
         double yLoc_LR;
         double zLoc_LR;
 
         double length_current = 100.0;//default higher than possible lengths
-        unsigned memIdFinalChoice = membraneMaxNode+1;//begin id as higher than possible id's
+        int memIdFinalChoice = membraneMaxNode+1;//begin id as higher than possible id's
 
         //iterate through membrane id's and choose closest one under cutoff length
-       // for (unsigned i = beginIndex; i < endIndex; i++ ) {
-        for (unsigned memId = 0; memId < membraneMaxNode; memId++) {
-            //unsigned memId = bucketNbrsExp[i];
+       // for (int i = beginIndex; i < endIndex; i++ ) {
+        for (int memId = 0; memId < membraneMaxNode; memId++) {
+            //int memId = bucketNbrsExp[i];
             if (memId < membraneMaxNode) {
                 xLoc_LR = membraneNodeXAddr[memId] - capsidNodeXAddr[capsidId];
                 yLoc_LR = membraneNodeYAddr[memId] - capsidNodeYAddr[capsidId];

@@ -10,8 +10,8 @@ double ComputeLJEnergy(
     LJInfoVecs& ljInfoVecs,  
     GeneralParams& generalParams) {    
      
-    thrust::counting_iterator<unsigned> begin(0);
-    thrust::counting_iterator<unsigned> end(generalParams.maxNodeCount);
+    thrust::counting_iterator<int> begin(0);
+    thrust::counting_iterator<int> end(generalParams.maxNodeCount);
  
     ljInfoVecs.lj_energy = thrust::transform_reduce(  
                     begin,end,
