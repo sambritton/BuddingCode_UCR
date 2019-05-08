@@ -37,10 +37,10 @@ void ComputeLinearSprings(
                 linearSpringInfoVecs.edge_initial_length.begin())),
         thrust::make_zip_iterator( 
             thrust::make_tuple(
-                edgeIdEnd,
-                coordInfoVecs.edges2Nodes_1.end(),
-                coordInfoVecs.edges2Nodes_2.end(), 
-                linearSpringInfoVecs.edge_initial_length.end())),
+                edgeIdBegin,
+                coordInfoVecs.edges2Nodes_1.begin(),
+                coordInfoVecs.edges2Nodes_2.begin(), 
+                linearSpringInfoVecs.edge_initial_length.begin())) + generalParams.num_of_edges,
         LinearSpringFunctor(
             linearSpringInfoVecs.spring_constant, 
             linearSpringInfoVecs.spring_constant_weak,
@@ -61,7 +61,7 @@ void ComputeLinearSprings(
       //std::cout<<"linear energy from spring.cu: "<< linearSpringInfoVecs.linear_spring_energy<<std::endl;
     //now we have un reduced forces. Sort by id and reduce. 
     //key, then value. Each vector returns sorted		
-    thrust::sort_by_key(linearSpringInfoVecs.tempNodeIdUnreduced.begin(), linearSpringInfoVecs.tempNodeIdUnreduced.end(),
+    thrust::sort_by_key(linearSpringInfoVecs.tempNodeIdUnreduced.begin(), linearSpringInfoVecs.tempNodeIdUnreduced.begin() + (generalParams.num_of_edges*linearSpringInfoVecs.factor),
         thrust::make_zip_iterator(
             thrust::make_tuple(
                 linearSpringInfoVecs.tempNodeForceXUnreduced.begin(),
@@ -109,6 +109,7 @@ void ComputeLinearSprings(
                 linearSpringInfoVecs.tempNodeForceYReduced.begin(),
                 linearSpringInfoVecs.tempNodeForceZReduced.begin())) + endKey,
         AddForceFunctor (
+            generalParams.num_of_nodes,
             thrust::raw_pointer_cast(coordInfoVecs.nodeForceX.data()),
             thrust::raw_pointer_cast(coordInfoVecs.nodeForceY.data()),
             thrust::raw_pointer_cast(coordInfoVecs.nodeForceZ.data())));
