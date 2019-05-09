@@ -39,7 +39,7 @@ void ComputeLinearSprings(
                 edgeIdBegin,
                 coordInfoVecs.edges2Nodes_1.begin(),
                 coordInfoVecs.edges2Nodes_2.begin(), 
-                linearSpringInfoVecs.edge_initial_length.begin())) + (coordInfoVecs.num_edges-1),
+                linearSpringInfoVecs.edge_initial_length.begin())) + (coordInfoVecs.num_edges),
         LinearSpringFunctor(
             linearSpringInfoVecs.spring_constant, 
             linearSpringInfoVecs.spring_constant_weak,
