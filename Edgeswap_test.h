@@ -8,8 +8,7 @@ class Edgeswap {
     std::vector<int> nndata;
 
     public:
-    Edgeswap(CoordInfoVecs& coordInfoVecs,
-    GeneralParams& generalParams);
+    Edgeswap(CoordInfoVecs& coordInfoVecs, GeneralParams& generalParams);
 
 	std::vector<bool> DomainBd (CoordInfoVecs& coordInfoVecs);
 	std::vector<int> Number_of_Neighbor(CoordInfoVecs& coordInfoVecs);

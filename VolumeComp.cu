@@ -10,7 +10,7 @@ void ComputeVolume(
     LJInfoVecs& ljInfoVecs) {  
     
         thrust::counting_iterator<int> triangleIdBegin(0);
-        thrust::counting_iterator<int> triangleIdEnd(generalParams.num_of_triangles);
+        thrust::counting_iterator<int> triangleIdEnd(coordInfoVecs.triangles2Nodes_1.size());
 
     generalParams.current_total_volume=
     thrust::transform_reduce(  
@@ -22,10 +22,10 @@ void ComputeVolume(
                 coordInfoVecs.triangles2Nodes_3.begin())),
         thrust::make_zip_iterator( 
             thrust::make_tuple(
-                triangleIdEnd,
-                coordInfoVecs.triangles2Nodes_1.end(),
-                coordInfoVecs.triangles2Nodes_2.end(), 
-                coordInfoVecs.triangles2Nodes_3.end())),
+                triangleIdBegin,
+                coordInfoVecs.triangles2Nodes_1.begin(),
+                coordInfoVecs.triangles2Nodes_2.begin(), 
+                coordInfoVecs.triangles2Nodes_3.begin())) + coordInfoVecs.num_triangles,
         VolumeCompFunctor(
             linearSpringInfoVecs.spring_constant, 
             thrust::raw_pointer_cast(coordInfoVecs.nodeLocX.data()),

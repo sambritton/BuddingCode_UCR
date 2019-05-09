@@ -18,6 +18,7 @@ struct LJSpringFunctor {
     double Rmin;
     double epsilon_rep1;
     double epsilon_rep2;
+    int* nodes_in_upperhem;
 
     double LJLocX;
     double LJLocY;
@@ -36,6 +37,7 @@ struct LJSpringFunctor {
         double& _Rmin,
         double& _epsilon_rep1,
         double& _epsilon_rep2,
+        int* _nodes_in_upperhem,
 
         double& _LJLocX,
         double& _LJLocY,
@@ -53,6 +55,7 @@ struct LJSpringFunctor {
         Rmin(_Rmin),
         epsilon_rep1(_epsilon_rep1),
         epsilon_rep2(_epsilon_rep2),
+        nodes_in_upperhem(_nodes_in_upperhem),
 
         LJLocX(_LJLocX),
         LJLocY(_LJLocY),
@@ -84,7 +87,7 @@ struct LJSpringFunctor {
         double forceY=0.0;
         double forceZ=0.0;
         double energy = 0.0;
-        if (R < Rmin) {
+        if (R < Rcutoff && nodes_in_upperhem[id] == 1) {
             
             double magnitude = 2*epsilon_rep1*
                                         (1-exp(-epsilon_rep2*(R-Rmin)))*
@@ -110,6 +113,13 @@ struct LJSpringFunctor {
             forceZAddr[id] += forceZ;
             //energy = epsilon + epsilon * (pow( Rmin/R, 12.0 ) - 2.0 * pow( Rmin / R, 6.0));//force positivity
             energy = epsilon_rep1 * (1-exp(-epsilon_rep2*(R - Rmin))) * (1-exp(-epsilon_rep2*(R - Rmin)));
+        }
+        else{
+            forceXAddr[id] += 0.0;
+            forceYAddr[id] += 0.0;
+            forceZAddr[id] += 0.0;
+            //energy = epsilon + epsilon * (pow( Rmin/R, 12.0 ) - 2.0 * pow( Rmin / R, 6.0));//force positivity
+            energy = 0.0;
         }
 
         

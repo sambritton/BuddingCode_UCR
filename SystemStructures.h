@@ -137,7 +137,6 @@ struct HostSetInfoVecs {
 };
 
 struct AddForceFunctor {
-	int& maxNodeCount;
 	double* forceXAddr;
 	double* forceYAddr;
 	double* forceZAddr;
@@ -145,11 +144,9 @@ struct AddForceFunctor {
 	__host__ __device__
 	//
 		AddForceFunctor(
-				int& _maxNodeCount,
 				double* _forceXAddr,
 				double* _forceYAddr,
 				double* _forceZAddr) :
-			maxNodeCount(_maxNodeCount),
 			forceXAddr(_forceXAddr),
 			forceYAddr(_forceYAddr),
 			forceZAddr(_forceZAddr) {}
@@ -157,13 +154,11 @@ struct AddForceFunctor {
 	__device__
 	void operator() (const Tuddd& u1d3) {
 			int idToAssign = thrust::get<0>(u1d3);
-			if (idToAssign < maxNodeCount){
-				if (!isnan(thrust::get<1>(u1d3)) && !isnan(thrust::get<2>(u1d3)) && !isnan(thrust::get<3>(u1d3))) {
+			if (!isnan(thrust::get<1>(u1d3)) && !isnan(thrust::get<2>(u1d3)) && !isnan(thrust::get<3>(u1d3))) {
 
-				forceXAddr[idToAssign] += thrust::get<1>(u1d3);
-				forceYAddr[idToAssign] += thrust::get<2>(u1d3);
-				forceZAddr[idToAssign] += thrust::get<3>(u1d3);
-				}
+			forceXAddr[idToAssign] += thrust::get<1>(u1d3);
+			forceYAddr[idToAssign] += thrust::get<2>(u1d3);
+			forceZAddr[idToAssign] += thrust::get<3>(u1d3);
 			}
 
 	}

@@ -69,12 +69,12 @@ void System::Solve_Forces(){
 
 
 void System::solveSystem() {
-	std::vector<unsigned> out;
-	//unsigned ALPHA;
+	std::vector<int> out;
+	//int ALPHA;
 
 	std::vector<bool> boundary_edges;
 	boundary_edges.reserve(coordInfoVecs.num_edges);
-	for (unsigned i = 0; i < coordInfoVecs.num_edges; i++){
+	for (int i = 0; i < coordInfoVecs.num_edges; i++){
 		if (coordInfoVecs.edges2Triangles_1[i] == coordInfoVecs.edges2Triangles_2[i]){
 			boundary_edges.push_back(true);
 		}
@@ -85,7 +85,7 @@ void System::solveSystem() {
 
 	std::vector<int> edgeIndices;
 	edgeIndices.reserve(coordInfoVecs.num_edges);
-	for (unsigned i = 0; i < coordInfoVecs.num_edges; ++i){
+	for (int i = 0; i < coordInfoVecs.num_edges; ++i){
 		//edgeIndices.push_back(edge_to_ljparticle[i]);
 		if (boundary_edges[i] == false){
 			edgeIndices.push_back(i);
@@ -99,12 +99,12 @@ void System::solveSystem() {
 	edgeIndices.erase(it, edgeIndices.end());
 	//std::vector<int> edge_to_ljparticle;
 	//edge_to_ljparticle.reserve(coordInfoVecs.num_edges);
-	unsigned node1, node2;
+	int node1, node2;
 	double R1, R2;
 	int last_index;
 	double Influence_Range = ljInfoVecs.Rmin;
 	//std::cout<<"Influence_Range = "<<Influence_Range<<std::endl;
-	unsigned num_edge_loop;
+	int num_edge_loop;
 	double LJ_PosX_backup, LJ_PosY_backup, LJ_PosZ_backup;
 	
 	double Max_Runtime = 1.0;
@@ -133,7 +133,7 @@ void System::solveSystem() {
 	std::cout<<"Sample size: "<<SAMPLE_SIZE<<std::endl;
 	auto edgeswap_ptr = std::make_shared<Edgeswap>(coordInfoVecs);
 
-	unsigned RECORD_TIME = 200;//round(Max_RunStep/2);
+	int RECORD_TIME = 200;//round(Max_RunStep/2);
 	std::cout<<"Record frequency = "<<RECORD_TIME<<std::endl;
 	
 
@@ -146,7 +146,7 @@ void System::solveSystem() {
 	double old_total_energy = 0.0;
 	double new_total_energy = 0.0;
 	double energy_gradient = 0.0;
-	unsigned Num_of_step_run = 0;
+	int Num_of_step_run = 0;
 	auto build_ptr = weak_bld_ptr.lock();//upgrade weak builder to access host variables.
 	std::cout<<"initial LJ-x : "<< ljInfoVecs.LJ_PosX <<std::endl;
 	std::cout<<"initial LJ-y : "<< ljInfoVecs.LJ_PosY <<std::endl;
@@ -217,7 +217,7 @@ void System::solveSystem() {
 		//storage->storeVariables();
 
 
-		unsigned edgeswap_iteration = 0;
+		int edgeswap_iteration = 0;
 		double preswap_energy = new_total_energy;
 		double postswap_energy;
 		double Ediff = 0.0;
@@ -319,7 +319,7 @@ void System::solveSystem() {
 					
 					
 					/*edge_to_ljparticle.clear();
-					for (unsigned w = 0; w < coordInfoVecs.num_edges; w++){
+					for (int w = 0; w < coordInfoVecs.num_edges; w++){
 						node1 = coordInfoVecs.edges2Nodes_1[w];
 						node2 = coordInfoVecs.edges2Nodes_2[w];
 						R1 = sqrt((coordInfoVecs.nodeLocX[node1] - ljInfoVecs.LJ_PosX)*(coordInfoVecs.nodeLocX[node1] - ljInfoVecs.LJ_PosX) +
@@ -358,14 +358,14 @@ void System::solveSystem() {
 						break;
 					}
 					
-					for (unsigned edge_loop = 0; edge_loop < num_edge_loop; edge_loop++) {
+					for (int edge_loop = 0; edge_loop < num_edge_loop; edge_loop++) {
 						
 						//std::random_device generator; //This is the older approach to generate random number, which may give bias 20190218
 						std::random_device rand_dev;
 						std::mt19937 generator(rand_dev());
 						std::uniform_int_distribution<int> distribution(1,edgeIndices.size());
 						int dice_roll = distribution(generator);
-						unsigned edge = edgeIndices[dice_roll - 1];
+						int edge = edgeIndices[dice_roll - 1];
 						
 						/*if (edge_to_ljparticle[edge] != -1){
 							bendingTriangleInfoVecs.initial_angle = BEND_ANGLE;
@@ -457,19 +457,19 @@ void System::initializeSystem(HostSetInfoVecs& hostSetInfoVecs) {
 	thrust::copy(hostSetInfoVecs.isNodeFixed.begin(),hostSetInfoVecs.isNodeFixed.end(), coordInfoVecs.isNodeFixed.begin());
 	
 	std::cout<<"fixed_node_in_host: "<<std::endl;
-	for (unsigned k = 0; k < hostSetInfoVecs.isNodeFixed.size(); k++){
+	for (int k = 0; k < hostSetInfoVecs.isNodeFixed.size(); k++){
 		//std::cout<<hostSetInfoVecs.isNodeFixed[k]<<std::endl;
 	}
 	std::cout<<"end_of_fixed_node_host_printout"<<std::endl;
 	std::cout<<"fixed_node_in_device: "<<std::endl;
-	for (unsigned k = 0; k < coordInfoVecs.isNodeFixed.size(); k++){
+	for (int k = 0; k < coordInfoVecs.isNodeFixed.size(); k++){
 		//std::cout<<coordInfoVecs.isNodeFixed[k]<<std::endl;
 	}
 	std::cout<<"end_of_fixed_node_device_printout"<<std::endl;
 std::cout<<"size of host fixed "<< hostSetInfoVecs.isNodeFixed.size()<<std::endl;
 std::cout<<"size of device fixed "<< coordInfoVecs.isNodeFixed.size()<<std::endl;
 
-	for (unsigned k = 0; k < coordInfoVecs.isNodeFixed.size(); k++){
+	for (int k = 0; k < coordInfoVecs.isNodeFixed.size(); k++){
 		bool isFixedHost = hostSetInfoVecs.isNodeFixed[k];
 		bool isFixedDevice = coordInfoVecs.isNodeFixed[k];
 		if (isFixedDevice != isFixedHost){
@@ -567,8 +567,8 @@ std::cout<<"size of device fixed "<< coordInfoVecs.isNodeFixed.size()<<std::endl
 
 
 	//currently unused
-	/*thrust::host_vector<unsigned> tempIds;
-	for (unsigned i = 0; i < hostSetInfoVecs.nodeLocX.size(); i++ ) {
+	/*thrust::host_vector<int> tempIds;
+	for (int i = 0; i < hostSetInfoVecs.nodeLocX.size(); i++ ) {
 		double xLoc = hostSetInfoVecs.nodeLocX[i];
 		double yLoc = hostSetInfoVecs.nodeLocY[i];
 		double zLoc = hostSetInfoVecs.nodeLocZ[i];

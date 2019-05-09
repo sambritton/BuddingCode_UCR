@@ -12,7 +12,7 @@ double ComputeMemRepulsionEnergy(
     AuxVecs& auxVecs) {    
     
     thrust::counting_iterator<int> nodeIdBegin(0);
-	thrust::counting_iterator<int> nodeIdEnd(generalParams.num_of_nodes);
+	thrust::counting_iterator<int> nodeIdEnd(generalParams.maxNodeCount);
 
 
     linearSpringInfoVecs.memrepulsion_energy=
@@ -28,13 +28,13 @@ double ComputeMemRepulsionEnergy(
                 nodeIdBegin,
                 coordInfoVecs.nodeLocX.begin(),
                 coordInfoVecs.nodeLocY.begin(),
-                coordInfoVecs.nodeLocZ.begin() )) + generalParams.num_of_nodes,
+                coordInfoVecs.nodeLocZ.begin() )) + generalParams.maxNodeCount,
         MemRepulsionEnergyFunctor(
             generalParams.Rmin,
             generalParams.abs_Rmin,
             linearSpringInfoVecs.spring_constant_rep1,
             linearSpringInfoVecs.spring_constant_rep2,
-            generalParams.num_of_nodes,
+            generalParams.maxNodeCount,
 
             thrust::raw_pointer_cast(coordInfoVecs.nndata1.data()),
             thrust::raw_pointer_cast(coordInfoVecs.nndata2.data()),

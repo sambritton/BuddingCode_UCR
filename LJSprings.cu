@@ -10,9 +10,9 @@ void ComputeLJSprings(
     LJInfoVecs& ljInfoVecs,  
     GeneralParams& generalParams) {    
      
-    CVec4 init(0.0, 0.0, 0.0, 0.0); 
+    CVec4 init(0.0, 0.0, 0.0, 0.0);  
     thrust::counting_iterator<int> begin(0);
-    thrust::counting_iterator<int> end(generalParams.num_of_nodes);
+    thrust::counting_iterator<int> end(generalParams.maxNodeCount);
 CVec4 temp = thrust::transform_reduce(  
                     begin,end,
                     LJSpringFunctor(
@@ -20,6 +20,7 @@ CVec4 temp = thrust::transform_reduce(
                         ljInfoVecs.Rmin_M,
                         ljInfoVecs.epsilon_M_rep1,
                         ljInfoVecs.epsilon_M_rep2,
+                        thrust::raw_pointer_cast(generalParams.nodes_in_upperhem.data()),
                         ljInfoVecs.LJ_PosX,
                         ljInfoVecs.LJ_PosY,
                         ljInfoVecs.LJ_PosZ,

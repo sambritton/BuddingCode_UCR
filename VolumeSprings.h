@@ -215,7 +215,7 @@ dV_r1_dz = (1.0/12.0)*(2.0*current_total_volume/abs(current_total_volume))*r1_dz
 
 }
 
-double magnitude = (spring_constant/(2.0*Rmin*Rmin*Rmin*eq_total_volume))*2*(true_current_total_volume - eq_total_volume);
+double magnitude = (spring_constant/(2*Rmin*Rmin*Rmin*eq_total_volume))*2*(true_current_total_volume - eq_total_volume);
 
 forceX += magnitude*(-dV_r1_dx);
 forceY += magnitude*(-dV_r1_dy);

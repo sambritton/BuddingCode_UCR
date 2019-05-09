@@ -8,7 +8,7 @@ setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/afs/crc.nd.edu/x86_64_linux/m/matlab
 #$ -q  gpu 	 # Specify queue
 #$ -l gpu_card=1
 #s -pe smp 4         #specifies threads??? maybe
-#$ -N  "edgeswaptest_small_growth4" # Specify job name
+#$ -N  "test" # Specify job name
 #$ -t 1       #specify number of data input files
 
 
