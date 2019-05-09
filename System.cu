@@ -19,7 +19,6 @@
 #include <vector>
 #include "VolumeComp.h"
 #include "VolumeSprings.h"
-#include <bits/stdc++.h> 
 
  //somehow the gradient is not being set in my version
 
@@ -35,7 +34,7 @@ void System::Solve_Forces(){
 	thrust::fill(coordInfoVecs.nodeForceX.begin(), coordInfoVecs.nodeForceX.end(), 0.0);
 	thrust::fill(coordInfoVecs.nodeForceY.begin(), coordInfoVecs.nodeForceY.end(), 0.0);
 	thrust::fill(coordInfoVecs.nodeForceZ.begin(), coordInfoVecs.nodeForceZ.end(), 0.0);
-	//std::cout<<"ERROR 11"<<std::endl;
+	
 	//setBucketScheme();
 	//std::cout<<"Error here! before linear"<<std::endl;
 	ComputeLinearSprings( 
@@ -43,22 +42,24 @@ void System::Solve_Forces(){
 		coordInfoVecs,
 		linearSpringInfoVecs, 
 		ljInfoVecs);
-		std::cout<<"ERROR 12"<<std::endl;
-	//if (coordInfoVecs.nodeLocX.size() > 0){
-	//	std::cout<<"force ="<<coordInfoVecs.nodeForceX[generalParams.num_of_nodes-1]<<" "<<coordInfoVecs.nodeForceY[generalParams.num_of_nodes-1]<<" "<<coordInfoVecs.nodeForceZ[generalParams.num_of_nodes-1]<<std::endl;
+	//	std::cout<<"LINEAR"<<std::endl;
+	
+	//if (coordInfoVecs.nodeLocX.size() > 162){
+	//	std::cout<<"force ="<<coordInfoVecs.nodeForceX[generalParams.maxNodeCount-1]<<" "<<coordInfoVecs.nodeForceY[generalParams.maxNodeCount-1]<<" "<<coordInfoVecs.nodeForceZ[generalParams.maxNodeCount-1]<<std::endl;
 	//}
 	//std::cout<<"Error here! before area"<<std::endl;
 	/*ComputeAreaTriangleSprings(
 		generalParams,
 		coordInfoVecs,
-		areaTriangleInfoVecs);
-		std::cout<<"ERROR 13"<<std::endl;*/
+		areaTriangleInfoVecs);*/
+	//	std::cout<<"AREA"<<std::endl;
+	
 	//std::cout<<"Error here! before bending"<<std::endl;
 	/*ComputeCosTriangleSprings(
 		generalParams,
 		coordInfoVecs,  
-		bendingTriangleInfoVecs); 
-		std::cout<<"ERROR 14"<<std::endl;*/
+		bendingTriangleInfoVecs); */
+	
 	//std::cout<<"Error here! before memrepul"<<std::endl;
 	/*ComputeMemRepulsionSprings(
 		coordInfoVecs,
@@ -72,21 +73,19 @@ void System::Solve_Forces(){
 		coordInfoVecs,
 		linearSpringInfoVecs,
 		ljInfoVecs);
-		std::cout<<"ERROR 15"<<std::endl;
+
 	ComputeVolumeSprings(
 		coordInfoVecs,
 		linearSpringInfoVecs, 
 		capsidInfoVecs,
 		generalParams,
-		auxVecs);
-		std::cout<<"ERROR 16"<<std::endl;*/
+		auxVecs);*/
 
 		
 };
 
 
 void System::solveSystem() {
-	//Edgeswap edgeswap(coordInfoVecs, generalParams);
 
 	double displacementX, displacementY, displacementZ;
 	double newcenterX, newcenterY, newcenterZ;
@@ -99,26 +98,26 @@ void System::solveSystem() {
 	////IDENTIFY CENTER OF THE SPHERE////////////////////////////////////////
 	////this is necessary to choose where to generate new lj points//////////
 	////which will be located within a distance away from the center/////////
-	for (int i = 0; i < generalParams.num_of_nodes; i++){
+	for (int i = 0; i < generalParams.maxNodeCount; i++){
 		generalParams.centerX += coordInfoVecs.nodeLocX[i];
 		generalParams.centerY += coordInfoVecs.nodeLocY[i];
 		generalParams.centerZ += coordInfoVecs.nodeLocZ[i];
 	}
-	generalParams.centerX = generalParams.centerX/generalParams.num_of_nodes;
-	generalParams.centerY = generalParams.centerY/generalParams.num_of_nodes;
-	generalParams.centerZ = generalParams.centerZ/generalParams.num_of_nodes;
+	generalParams.centerX = generalParams.centerX/generalParams.maxNodeCount;
+	generalParams.centerY = generalParams.centerY/generalParams.maxNodeCount;
+	generalParams.centerZ = generalParams.centerZ/generalParams.maxNodeCount;
 	////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////
 
-	std::vector<double> V1 = {0.0};/*{ 0.2294,   -0.7103,    1.21788 ,  -1.3525 ,  -0.3047,
+	std::vector<double> V1 = {0.0, 0.0};/*{ 0.2294,   -0.7103,    1.21788 ,  -1.3525 ,  -0.3047,
 		0.8073,   -0.9284 ,  -0.9918 ,  -1.7507 ,  -2.1332,
 		1.1312 ,  -0.2897 ,  -1.0996 ,  -0.3552 ,   0.9047};*/ //{-0.02283, -0.02283, -0.02283};
 
-	std::vector<double> V2 = {0.0};/*{-0.7403 ,   0.0554 ,  -0.21368  ,  1.0354 ,   2.0994,
+	std::vector<double> V2 = {0.0, 0.0};/*{-0.7403 ,   0.0554 ,  -0.21368  ,  1.0354 ,   2.0994,
 		0.1924 ,  -1.7749 ,   0.4700 ,   0.5478 ,  -1.3549,
 		0.4430 ,   0.6601 ,  -0.6469 ,  -1.0153 ,   0.9085};*/ //{2.384208, 2.384208, 1.68};
 
-	std::vector<double> V3 = {0.0};/*{-0.9997 ,  -0.8749 ,  -1.82367 ,  -0.7812,    0.4490,
+	std::vector<double> V3 = {-0.5, 0.5};/*{-0.9997 ,  -0.8749 ,  -1.82367 ,  -0.7812,    0.4490,
 		2.0808 ,  -0.2730 ,   0.4642 ,   1.1056  , 0.6132,
 		0.3975 ,  -0.9000 ,   2.1327  , -0.8614 ,  -0.6783};*/ //{1.5243396, 1.1043396, 1.5243396};
 	
@@ -143,8 +142,8 @@ void System::solveSystem() {
 	//int ALPHA;
 
 	std::vector<bool> boundary_edges;
-	boundary_edges.reserve(generalParams.num_of_edges);
-	for (int i = 0; i < generalParams.num_of_edges; i++){
+	boundary_edges.reserve(coordInfoVecs.num_edges);
+	for (int i = 0; i < coordInfoVecs.num_edges; i++){
 		if (coordInfoVecs.edges2Triangles_1[i] == coordInfoVecs.edges2Triangles_2[i]){
 			boundary_edges.push_back(true);
 		}
@@ -154,31 +153,31 @@ void System::solveSystem() {
 	}
 
 	std::vector<int> edgeIndices;
-	edgeIndices.reserve(generalParams.num_of_edges);
-	for (int i = 0; i < generalParams.num_of_edges; ++i){
+	edgeIndices.reserve(coordInfoVecs.num_edges);
+	for (int i = 0; i < coordInfoVecs.num_edges; ++i){
 		//edgeIndices.push_back(edge_to_ljparticle[i]);
 		if (boundary_edges[i] == false){
 			edgeIndices.push_back(i);
 		}
-		//else {
-		//	edgeIndices.push_back(INT_MAX);
-		//}
+		else {
+			edgeIndices.push_back(-1);
+		}
 	}
 
 
 
-	//auto it = remove_if(edgeIndices.begin(), edgeIndices.end(),  [](const int i) {return i < 0; });
-	//edgeIndices.erase(it, edgeIndices.end());
+	auto it = remove_if(edgeIndices.begin(), edgeIndices.end(),  [](const int i) {return i < 0; });
+	edgeIndices.erase(it, edgeIndices.end());
 
 	//std::vector<int> nodes_to_center;
-	generalParams.nodes_in_upperhem.resize(generalParams.num_of_nodes, INT_MAX);
-	for (int i = 0; i < generalParams.num_of_nodes; i++){
-		if (coordInfoVecs.nodeLocZ[i] > (generalParams.centerZ + 2.5)){
+	generalParams.nodes_in_upperhem.resize(generalParams.maxNodeCount);
+	for (int i = 0; i < generalParams.maxNodeCount; i++){
+		if (coordInfoVecs.nodeLocZ[i] > (generalParams.centerZ + 2.0)){
 			generalParams.nodes_in_upperhem[i] = 1;
 		}
-		//else{
-		//	generalParams.nodes_in_upperhem[i] = -1;
-		//}
+		else{
+			generalParams.nodes_in_upperhem[i] = -1;
+		}
 		
 	}
 
@@ -188,47 +187,38 @@ void System::solveSystem() {
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	
-	generalParams.triangles_in_upperhem.resize(generalParams.num_of_triangles);
-	for (int i = 0; i < generalParams.num_of_triangles; i++){
-		int aaa = generalParams.nodes_in_upperhem[coordInfoVecs.triangles2Nodes_1[i]];
-		int bbb = generalParams.nodes_in_upperhem[coordInfoVecs.triangles2Nodes_2[i]];
-		int ccc = generalParams.nodes_in_upperhem[coordInfoVecs.triangles2Nodes_3[i]];
-		if ((aaa+bbb+ccc)==3){
-			generalParams.triangles_in_upperhem[i] = 1;
-			
-			//triangles_in_upperhem.push_back(i);
-		}
-		//std::cout<<"triangles in upperhem "<<generalParams.triangles_in_upperhem[i]<<std::endl;
-		else{
-			generalParams.triangles_in_upperhem[i] = -1;
-		}
-		
-	}
-	//std::vector<int> edges_in_upperhem;
-	generalParams.edges_in_upperhem.resize(generalParams.num_of_edges);
-	for (int i = 0; i < generalParams.num_of_edges; i++){
-		int aaa = coordInfoVecs. edges2Triangles_1[i];
-		int bbb = coordInfoVecs. edges2Triangles_2[i];
-		int aaaa = generalParams.triangles_in_upperhem[aaa];
-		int bbbb = generalParams.triangles_in_upperhem[bbb];
-		if (aaaa == 1 && bbbb == 1){
+	std::vector<int> edges_in_upperhem;
+	generalParams.edges_in_upperhem.resize(coordInfoVecs.edges2Nodes_1.size());
+	for (int i = 0; i < coordInfoVecs.edges2Nodes_1.size(); i++){
+		int aaa = generalParams.nodes_in_upperhem[coordInfoVecs.edges2Nodes_1[i]];
+		int bbb = generalParams.nodes_in_upperhem[coordInfoVecs.edges2Nodes_2[i]];
+		if (aaa == 1 && bbb == 1){
 			generalParams.edges_in_upperhem[i] = 1;
-			generalParams.edges_in_upperhem_index.push_back(i);
+			edges_in_upperhem.push_back(i);
 		}
 		else{
 			generalParams.edges_in_upperhem[i] = -1;
 		}
 		
 	}
-
-	std::vector<int> edges_in_upperhem_for_loop;
-	for (int i = 0; i < generalParams.edges_in_upperhem_index.size(); i++){
-		edges_in_upperhem_for_loop.push_back(generalParams.edges_in_upperhem_index[i]);
+	generalParams.triangles_in_upperhem.resize(coordInfoVecs.triangles2Nodes_1.size());
+	for (int i = 0; i < coordInfoVecs.triangles2Nodes_1.size(); i++){
+		int aaa = generalParams.nodes_in_upperhem[coordInfoVecs.triangles2Nodes_1[i]];
+		int bbb = generalParams.nodes_in_upperhem[coordInfoVecs.triangles2Nodes_2[i]];
+		int ccc = generalParams.nodes_in_upperhem[coordInfoVecs.triangles2Nodes_3[i]];
+		if ((aaa+bbb+ccc)==3){
+			generalParams.triangles_in_upperhem[i] = 1;
+			//triangles_in_upperhem.push_back(i);
+		}
+		else{
+			generalParams.triangles_in_upperhem[i] = -1;
+		}
+		
 	}
 
 	//std::vector<int> edge_to_ljparticle;
 	//generalParams.edge_to_ljparticle.reserve(coordInfoVecs.num_edges);
-	for (int i = 0; i < generalParams.num_of_edges; i++){
+	for (int i = 0; i < coordInfoVecs.num_edges; i++){
 		generalParams.edge_to_ljparticle.push_back(-1);
 	};
 	
@@ -240,7 +230,7 @@ void System::solveSystem() {
 	int num_edge_loop;
 	double LJ_PosX_backup, LJ_PosY_backup, LJ_PosZ_backup;
 	
-	double Max_Runtime = 0.001;
+	double Max_Runtime = 0.05;
 	double Max_RunStep = Max_Runtime/generalParams.dt;
 	std::cout<<"Max runtime = "<<Max_Runtime<<std::endl;
 	std::cout<<"Max runstep = "<<Max_RunStep<<std::endl;
@@ -253,7 +243,7 @@ void System::solveSystem() {
 	//std::cout<<"spring_constnat_rep1 = "<<linearSpringInfoVecs.spring_constant_rep1<<std::endl;
 	//std::cout<<"spring_constnat_rep2 = "<<linearSpringInfoVecs.spring_constant_rep2<<std::endl;
 
-	generalParams.volume_spring_constant = 1.75;
+	generalParams.volume_spring_constant = 1.25;
 
 	double scale = 10.0;
 	std::cout<<"scaling of different region = "<<scale<<std::endl;
@@ -279,16 +269,16 @@ void System::solveSystem() {
 	//std::cout<<"coat angle = "<<bendingTriangleInfoVecs.initial_angle_coat<<std::endl;
 	generalParams.Rmin = 1.0;
 	generalParams.abs_Rmin = 1.0;//0.586955;
-	ljInfoVecs.Rmin_M = 1.0;
-	ljInfoVecs.Rcutoff_M = 1.0;
-	ljInfoVecs.Rmin_LJ = 2.0;//3.0//1.0;
-	ljInfoVecs.Rcutoff_LJ = 2.0;//3.0;//1.0;
+	ljInfoVecs.Rmin_M = 0.75;
+	ljInfoVecs.Rcutoff_M = 3.25;
+	ljInfoVecs.Rmin_LJ = 1.0;//3.0//1.0;
+	ljInfoVecs.Rcutoff_LJ = 1.1;//3.0;//1.0;
 	//ljInfoVecs.epsilon_M = 1.0;
-	ljInfoVecs.epsilon_M_rep1 = 0.0;//16.0;
-	ljInfoVecs.epsilon_M_rep2 = 0.0;//1.0;
+	ljInfoVecs.epsilon_M_rep1 = 0.5;//16.0;
+	ljInfoVecs.epsilon_M_rep2 = 0.9;//1.0;
 	//ljInfoVecs.epsilon_LJ = 0.25;
-	ljInfoVecs.epsilon_LJ_rep1 = 0.0;//0.5;// 0.06;//7.5;
-	ljInfoVecs.epsilon_LJ_rep2 = 0.0;//1.0;//1.0;//1.0;
+	ljInfoVecs.epsilon_LJ_rep1 = 0.125;//0.5;// 0.06;//7.5;
+	ljInfoVecs.epsilon_LJ_rep2 = 1.0;//1.0;//1.0;//1.0;
 	std::cout<<"Absolute minimum edge size = "<<generalParams.abs_Rmin<<std::endl;
 	//std::cout<<"Morse D = "<<linearSpringInfoVecs.spring_constant_rep1<<std::endl;
 	//std::cout<<"Morse a = "<<linearSpringInfoVecs.spring_constant_rep2<<std::endl;
@@ -296,8 +286,8 @@ void System::solveSystem() {
 
 	double initial_kT;
 	initial_kT = generalParams.kT;//This is for the acceptance of change after looping through every edge within proximity.
-		//double SAMPLE_SIZE = 0.5;
-	//std::cout<<"Sample size: "<<SAMPLE_SIZE<<std::endl;
+		double SAMPLE_SIZE = 0.5;
+	std::cout<<"Sample size: "<<SAMPLE_SIZE<<std::endl;
 	auto edgeswap_ptr = std::make_shared<Edgeswap>(coordInfoVecs, generalParams);
 
 
@@ -307,7 +297,7 @@ void System::solveSystem() {
 	int RECORD_TIME = 1;//round(Max_RunStep/2);
 	std::cout<<"Record frequency = "<<RECORD_TIME<<std::endl;
 	std::cout<<"Growth frequency = "<<GROWTH_TIME<<std::endl;
-	int NKBT = 2; //The max number of edge-swap attempt per kBT value
+	int NKBT = 50; //The max number of edge-swap attempt per kBT value
 	std::cout<<"Number of edge-swap per kBT value = "<<NKBT<<std::endl;
 	double min_kT = 0.21;
 	std::cout<<"min kT for sim. termination = "<<min_kT<<std::endl;
@@ -316,20 +306,19 @@ void System::solveSystem() {
 	double new_total_energy = 0.0;
 	double energy_gradient = 0.0;
 	int Num_of_step_run = 0;
-	//std::cout<<"ERROR 0"<<std::endl;
 	auto build_ptr = weak_bld_ptr.lock();//upgrade weak builder to access host variables.
-	//std::cout<<"initial LJ-x : "<< ljInfoVecs.LJ_PosX <<std::endl;
-	//std::cout<<"initial LJ-y : "<< ljInfoVecs.LJ_PosY <<std::endl;
-	//std::cout<<"initial LJ-z : "<< ljInfoVecs.LJ_PosZ <<std::endl;
-	//	std::cout<<"ERROR 1"<<std::endl;
+	std::cout<<"initial LJ-x : "<< ljInfoVecs.LJ_PosX <<std::endl;
+	std::cout<<"initial LJ-y : "<< ljInfoVecs.LJ_PosY <<std::endl;
+	std::cout<<"initial LJ-z : "<< ljInfoVecs.LJ_PosZ <<std::endl;
+		
 
     
 	double min_energy;
 	//storage->print_VTK_File();
-	//storage->storeVariables();
+	////storage->storeVariables();
 
 	////////////////////////////////////////
-	//std::cout<<"ERROR 2"<<std::endl;
+	
 	ComputeVolume(
 		generalParams,
 		coordInfoVecs,
@@ -337,7 +326,7 @@ void System::solveSystem() {
 		ljInfoVecs
 	);
 
-	generalParams.eq_total_volume = generalParams.true_current_total_volume*1.35;//This is for setting different equilibrium volume to mimic growth or shirnkage.
+	generalParams.eq_total_volume = generalParams.true_current_total_volume*1.50;//This is for setting different equilibrium volume to mimic growth or shirnkage.
 	std::cout<<"true_current_total_volume = "<<generalParams.true_current_total_volume<<std::endl;
 	std::cout<<"eq_total_volume = "<<generalParams.eq_total_volume<<std::endl;
 
@@ -350,10 +339,10 @@ void System::solveSystem() {
 		//generalParams.kT = 1.0;//reset kT before simulations starts.
 		//Max_Runtime = 0.0;//2.5;
 		int translate_counter = 0;
-			while (current_time < (Max_Runtime)){
+			while (current_time < (2.0*Max_Runtime)){
 					translate_counter += 1;
 					Solve_Forces();
-			//		std::cout<<"ERROR 3"<<std::endl;
+				
 					/*double energy_rep =
 					ComputeMemRepulsionEnergy(
 						coordInfoVecs,
@@ -404,33 +393,28 @@ void System::solveSystem() {
 					coordInfoVecs,
 					generalParams,
 					domainParams);
-		//			std::cout<<"ERROR 4"<<std::endl;
-				if (translate_counter % 500 == 0){
-					std::cout<<"ERROR 4.125"<<std::endl;
+				if (translate_counter % 20 == 1){
+
 					newcenterX = 0.0;
 					newcenterY = 0.0;
 					newcenterZ = 0.0;
-					for (int i = 0; i < generalParams.num_of_nodes; i++){
-						std::cout<<"haha "<<i<<std::endl;
+					for (int i = 0; i < coordInfoVecs.nodeLocX.size(); i++){
 						newcenterX += coordInfoVecs.nodeLocX[i];
 						newcenterY += coordInfoVecs.nodeLocY[i];
 						newcenterZ += coordInfoVecs.nodeLocZ[i];
-						
 					}
-					std::cout<<"ERROR 4.25"<<std::endl;
-					newcenterX = newcenterX/generalParams.num_of_nodes;
-					newcenterY = newcenterY/generalParams.num_of_nodes;
-					newcenterZ = newcenterZ/generalParams.num_of_nodes;
+					newcenterX = newcenterX/coordInfoVecs.nodeLocX.size();
+					newcenterY = newcenterY/coordInfoVecs.nodeLocX.size();
+					newcenterZ = newcenterZ/coordInfoVecs.nodeLocX.size();
 					displacementX = newcenterX - generalParams.centerX;
 					displacementY = newcenterY - generalParams.centerY;
 					displacementZ = newcenterZ - generalParams.centerZ;
-		//			std::cout<<"ERROR 4.5"<<std::endl;
-					for (int i = 0; i < generalParams.num_of_nodes; i++){
+
+					for (int i = 0; i < generalParams.maxNodeCount; i++){
 						coordInfoVecs.nodeLocX[i] += -displacementX;
 						coordInfoVecs.nodeLocY[i] += -displacementY;
 						coordInfoVecs.nodeLocZ[i] += -displacementZ;
 					}
-		//			std::cout<<"ERROR 5"<<std::endl;
 				}
 							
 					new_total_energy = linearSpringInfoVecs.linear_spring_energy + 
@@ -438,13 +422,12 @@ void System::solveSystem() {
 						bendingTriangleInfoVecs.bending_triangle_energy + 
 						//0.5*energy_rep + 
 						ljInfoVecs.lj_energy_M +
-						ljInfoVecs.lj_energy_LJ+
-						generalParams.volume_energy;
+						ljInfoVecs.lj_energy_LJ;
 
 				energy_gradient = sqrt((new_total_energy - old_total_energy)*(new_total_energy - old_total_energy));
 				old_total_energy = new_total_energy;
 				current_time+=generalParams.dt;
-		//		std::cout<<"ERROR 6"<<std::endl;
+				
 
 			}
 		std::cout<<"current time (1st iter before edgeswap): "<< current_time << std::endl;
@@ -459,9 +442,10 @@ void System::solveSystem() {
 		}
 	
 		//edgeswap_ptr->transferDtoH(coordInfoVecs, build_ptr->hostSetInfoVecs);//Currently this is treated as a backup of coordInfoVecs
-		//storage->print_VTK_File();
-		//storage->storeVariables();
+		////storage->print_VTK_File();
+		////storage->storeVariables();
 		runSim = false;
+		break;
 
 		int edgeswap_iteration = 0;
 		double preswap_energy = new_total_energy;
@@ -469,7 +453,7 @@ void System::solveSystem() {
 		double Ediff = 0.0;
 		//initial_kT = generalParams.kT;
 		num_edge_loop = 4;//round(edges_in_upperhem.size()*SAMPLE_SIZE);	
-		std::cout<<"num of edges tested per edgeswap = "<<num_edge_loop<<std::endl;
+	
  		while (initial_kT > 0){
  					////////////////////NOW RELAX THE ATTEMPTED EDGESWAP//////////////////////
 					 current_time = 0.0;
@@ -521,41 +505,39 @@ void System::solveSystem() {
  							generalParams,
 							 domainParams);
 						
-						if (translate_counter % 40 == 1){
+						if (translate_counter % 20 == 1){
 							newcenterX = 0.0;
 							newcenterY = 0.0;
 							newcenterZ = 0.0;
-							for (int i = 0; i < generalParams.num_of_nodes; i++){
+							for (int i = 0; i < coordInfoVecs.nodeLocX.size(); i++){
 								newcenterX += coordInfoVecs.nodeLocX[i];
 								newcenterY += coordInfoVecs.nodeLocY[i];
 								newcenterZ += coordInfoVecs.nodeLocZ[i];
 							}
-							newcenterX = newcenterX/generalParams.num_of_nodes;
-							newcenterY = newcenterY/generalParams.num_of_nodes;
-							newcenterZ = newcenterZ/generalParams.num_of_nodes;
+							newcenterX = newcenterX/coordInfoVecs.nodeLocX.size();
+							newcenterY = newcenterY/coordInfoVecs.nodeLocX.size();
+							newcenterZ = newcenterZ/coordInfoVecs.nodeLocX.size();
 							displacementX = newcenterX - generalParams.centerX;
 							displacementY = newcenterY - generalParams.centerY;
 							displacementZ = newcenterZ - generalParams.centerZ;
 			
-							for (int i = 0; i < generalParams.num_of_nodes; i++){
+							for (int i = 0; i < generalParams.maxNodeCount; i++){
 							coordInfoVecs.nodeLocX[i] += -displacementX;
 							coordInfoVecs.nodeLocY[i] += -displacementY;
 							coordInfoVecs.nodeLocZ[i] += -displacementZ;
 							}
-//std::cout<<"WHERE IS THE PROBLEM 1?"<<std::endl;
+
 							for (int edge_loop = 0; edge_loop < num_edge_loop; edge_loop++) {
 				
 								//std::random_device generator; //This is the older approach to generate random number, which may give bias 20190218
 								std::random_device rand_dev;
 								std::mt19937 generator(rand_dev());
 							   //std::uniform_int_distribution<int> distribution(1,edgeIndices.size());
-							   std::uniform_int_distribution<int> distribution(1, edges_in_upperhem_for_loop.size());//generalParams.edges_in_upperhem_index.size());
-							   //std::uniform_int_distribution<int> distribution(1,generalParams.num_of_edges);	
-							   int dice_roll = distribution(generator);
+							   std::uniform_int_distribution<int> distribution(1,edges_in_upperhem.size());
+								int dice_roll = distribution(generator);
 							   //int edge = edgeIndices[dice_roll - 1];
-							   int edge = edges_in_upperhem_for_loop[dice_roll -1];//edges_in_upperhem_index[dice_roll - 1];
+							   int edge = edges_in_upperhem[dice_roll - 1];
 								int ALPHA = edgeswap_ptr->edge_swap_device_vecs(
-								
 									edge,
 									generalParams,
 									coordInfoVecs,
@@ -565,7 +547,7 @@ void System::solveSystem() {
 									areaTriangleInfoVecs);
 								num_edge_loop = num_edge_loop + ALPHA;
 							}
-//							std::cout<<"WHERE IS THE PROBLEM 2?"<<std::endl;
+		
 						}
 						
  						new_total_energy = linearSpringInfoVecs.linear_spring_energy + 
@@ -573,8 +555,7 @@ void System::solveSystem() {
  							bendingTriangleInfoVecs.bending_triangle_energy +
  							//0.5*energy_rep +
  							ljInfoVecs.lj_energy_M +  
-							 ljInfoVecs.lj_energy_LJ +
-							 generalParams.volume_energy;
+ 							ljInfoVecs.lj_energy_LJ;
  						//std::cout<<"new_total_energy = "<<new_total_energy<<std::endl;
 
  						energy_gradient = sqrt((new_total_energy - old_total_energy)*(new_total_energy - old_total_energy));
@@ -589,22 +570,66 @@ void System::solveSystem() {
  					LJ_PosZ_backup = ljInfoVecs.LJ_PosZ;*/
 											
 			
-//					 std::cout<<"WHERE IS THE PROBLEM 3?"<<std::endl;	
+ 								
  					if (edgeswap_iteration % RECORD_TIME == 0){
- 						storage->print_VTK_File();
+ 						//storage->print_VTK_File();
 						 std::cout<<"current total energy = "<< new_total_energy<<std::endl;
 						 std::cout<<"true current total volume = "<<generalParams.true_current_total_volume<<std::endl;
  					}
  					if (edgeswap_iteration % (1*RECORD_TIME) == 0){
- 						storage->storeVariables();
+ 						//storage->storeVariables();
 					 }
 
-//					 std::cout<<"WHERE IS THE PROBLEM 4?"<<std::endl;
+					
 
 					 edgeswap_iteration += 1;
-					 generalParams.edgeswap_iteration += 1;
 					 
-					
+					/*if (edgeswap_iteration % GROWTH_TIME == 0){
+
+						for (int i = 0; i < coordInfoVecs.nodeLocX.size(); i++){
+							generalParams.centerX += coordInfoVecs.nodeLocX[i];
+							generalParams.centerY += coordInfoVecs.nodeLocY[i];
+							generalParams.centerZ += coordInfoVecs.nodeLocZ[i];
+						}
+						generalParams.centerX = generalParams.centerX/coordInfoVecs.nodeLocX.size();
+						generalParams.centerY = generalParams.centerY/coordInfoVecs.nodeLocX.size();
+						generalParams.centerZ = generalParams.centerZ/coordInfoVecs.nodeLocX.size();
+
+						double x,y,z;
+						std::random_device rand_dev0;
+						std::mt19937 generator0(rand_dev0());
+						std::uniform_real_distribution<double> guess(generalParams.centerX-1.0, generalParams.centerX+1.0);
+						x = 5.0;//guess(generator0);
+						y = 5.0;//guess(generator0);
+						z = 5.0;//guess(generator0);
+						bool goodchoice = false;
+						double GAP;
+						while (sqrt(x*x + y*y + z*z) > (2.0) && goodchoice == false){
+							x = guess(generator0);
+							y = guess(generator0);
+							z = guess(generator0);
+							if (sqrt(x*x + y*y + z*z) > 2.0){
+								continue;
+							}
+							for (int i = 0; i < ljInfoVecs.LJ_PosX_all.size(); i++){
+								GAP = sqrt((x-ljInfoVecs.LJ_PosX_all[i])*(x-ljInfoVecs.LJ_PosX_all[i]) +
+											(y-ljInfoVecs.LJ_PosY_all[i])*(x-ljInfoVecs.LJ_PosY_all[i]) +
+											(z-ljInfoVecs.LJ_PosZ_all[i])*(x-ljInfoVecs.LJ_PosZ_all[i]));
+								if (GAP < 0.65){
+									goodchoice = false;
+									break;
+								}
+								else{goodchoice = true;}
+							}
+						}
+						ljInfoVecs.LJ_PosX_all.push_back(x);
+						ljInfoVecs.LJ_PosY_all.push_back(y);
+						ljInfoVecs.LJ_PosZ_all.push_back(z);
+						ljInfoVecs.forceX_all.resize(ljInfoVecs.LJ_PosX_all.size());
+						ljInfoVecs.forceY_all.resize(ljInfoVecs.LJ_PosX_all.size());
+						ljInfoVecs.forceZ_all.resize(ljInfoVecs.LJ_PosX_all.size());
+						generalParams.maxNodeCountLJ = ljInfoVecs.LJ_PosX_all.size();
+					}*/
  					//std::cout<<"edgeswap_iteration = "<<edgeswap_iteration<<std::endl;
  					if (edgeswap_iteration == NKBT){
  						generalParams.kT = -1.0;//generalParams.kT - 0.072;
@@ -616,15 +641,14 @@ void System::solveSystem() {
 					runSim = false;
 					break;
 					 }
-//					 std::cout<<"WHERE IS THE PROBLEM 5?"<<std::endl;
+
 					 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////// GROWTH OF THE CELL (MEMBRANE) ////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-if (edgeswap_iteration % GROWTH_TIME == 0){
 bool triggered = false;
 int triggered_counter = 0;
-for (int p = 0; p < edges_in_upperhem_for_loop.size(); p++){//(int p = 0; p < generalParams.num_of_edges; p++){
+/*for (int p = 0; p < edges_in_upperhem_for_loop.size(); p++){//(int p = 0; p < generalParams.num_of_edges; p++){
 	
 		int k = generalParams.edges_in_upperhem_index[p];
 		if (generalParams.edges_in_upperhem[k] == INT_MAX){
@@ -1041,26 +1065,25 @@ for (int p = 0; p < edges_in_upperhem_for_loop.size(); p++){//(int p = 0; p < ge
 						//if (triggered == true){
 						//	break;
 						//}
-					}
-				
-//					std::cout<<"WHERE IS THE PROBLEM 6?"<<std::endl;
-//generalParams.maxNodeCount = coordInfoVecs.nodeLocX.size();
-//std::cout<<"maxnodecount = " <<generalParams.maxNodeCount<<std::endl;
-//generalParams.num_of_edges = coordInfoVecs.edges2Nodes_1.size();
-//std::cout<<"num_of_edges = " <<generalParams.num_of_edges<<std::endl;
-//generalParams.num_of_triangles = coordInfoVecs.triangles2Nodes_1.size();
-//std::cout<<"num_of_triangles = " <<generalParams.num_of_triangles<<std::endl;
-//coordInfoVecs.nodeForceX.resize(coordInfoVecs.nodeLocX.size());
-//coordInfoVecs.nodeForceY.resize(coordInfoVecs.nodeLocX.size());
-//coordInfoVecs.nodeForceZ.resize(coordInfoVecs.nodeLocX.size());
+					}*/
+// if (triggered_counter > 0){
+// generalParams.maxNodeCount = coordInfoVecs.nodeLocX.size();
+// //std::cout<<"maxnodecount = " <<generalParams.maxNodeCount<<std::endl;
+// generalParams.num_of_edges = coordInfoVecs.edges2Nodes_1.size();
+// //std::cout<<"num_of_edges = " <<generalParams.num_of_edges<<std::endl;
+// generalParams.num_of_triangles = coordInfoVecs.triangles2Nodes_1.size();
+// //std::cout<<"num_of_triangles = " <<generalParams.num_of_triangles<<std::endl;
+
+// }
+
 //std::cout<<"GROWTH DONE!"<<std::endl;
- //storage->print_VTK_File();
-//storage->storeVariables();
+ ////storage->print_VTK_File();
+////storage->storeVariables();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////// END OF GROWTH SECTION //////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				}
+
  					
 					
  			}
@@ -1089,61 +1112,57 @@ void System::set_weak_builder(std::weak_ptr<SystemBuilder> _weak_bld_ptr) {
 void System::initializeSystem(HostSetInfoVecs& hostSetInfoVecs) {
 	std::cout<<"Initializing"<<std::endl;
 
-	//generalParams.maxNodeCount = hostSetInfoVecs.nodeLocX.size();
-	//coordInfoVecs.num_edges = hostSetInfoVecs.edges2Nodes_1.size();
-	//coordInfoVecs.num_triangles = hostSetInfoVecs.triangles2Nodes_1.size();
-	generalParams.num_of_nodes = hostSetInfoVecs.nodeLocX.size();
-	generalParams.num_of_edges = hostSetInfoVecs.edges2Nodes_1.size();
-	generalParams.num_of_triangles = hostSetInfoVecs.triangles2Nodes_1.size();
+	generalParams.maxNodeCount = hostSetInfoVecs.nodeLocX.size();
+	coordInfoVecs.num_edges = hostSetInfoVecs.edges2Nodes_1.size();
+	coordInfoVecs.num_triangles = hostSetInfoVecs.triangles2Nodes_1.size();
 
-	std::cout<<"num nodes: "<< generalParams.num_of_nodes << std::endl;
-	std::cout<<"num edges: "<< generalParams.num_of_edges << std::endl;
-	std::cout<<"num elems: "<< generalParams.num_of_triangles << std::endl;
+	std::cout<<"num nodes: "<< generalParams.maxNodeCount << std::endl;
+	std::cout<<"num edges: "<< coordInfoVecs.num_edges << std::endl;
+	std::cout<<"num elems: "<< coordInfoVecs.num_triangles << std::endl;
 	//allocate memory
-	//Note that "FLAGVALUE = 2000000" acts as the flag value such that if 
-	coordInfoVecs.isNodeFixed.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),-1);
-	coordInfoVecs.prevNodeLocX.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),-100000.0);
-	coordInfoVecs.prevNodeLocY.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),-100000.0);
-	coordInfoVecs.prevNodeLocZ.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),-100000.0);
+	coordInfoVecs.isNodeFixed.resize(2*hostSetInfoVecs.nodeLocX.size());
+	coordInfoVecs.prevNodeLocX.resize(2*hostSetInfoVecs.nodeLocX.size());
+	coordInfoVecs.prevNodeLocY.resize(2*hostSetInfoVecs.nodeLocX.size());
+	coordInfoVecs.prevNodeLocZ.resize(2*hostSetInfoVecs.nodeLocX.size());
 
-	coordInfoVecs.prevNodeForceX.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),0.0);
-	coordInfoVecs.prevNodeForceY.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),0.0);
-	coordInfoVecs.prevNodeForceZ.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),0.0);
+	coordInfoVecs.prevNodeForceX.resize(2*hostSetInfoVecs.nodeLocX.size());
+	coordInfoVecs.prevNodeForceY.resize(2*hostSetInfoVecs.nodeLocX.size());
+	coordInfoVecs.prevNodeForceZ.resize(2*hostSetInfoVecs.nodeLocX.size());
 	
-	coordInfoVecs.nodeLocX.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),-100000.0);
-	coordInfoVecs.nodeLocY.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),-100000.0);
-	coordInfoVecs.nodeLocZ.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),-100000.0);
+	coordInfoVecs.nodeLocX.resize(2*hostSetInfoVecs.nodeLocX.size());
+	coordInfoVecs.nodeLocY.resize(2*hostSetInfoVecs.nodeLocX.size());
+	coordInfoVecs.nodeLocZ.resize(2*hostSetInfoVecs.nodeLocX.size());
 
-	coordInfoVecs.nodeForceX.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),0.0);
-	coordInfoVecs.nodeForceY.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),0.0);
-	coordInfoVecs.nodeForceZ.resize(generalParams.mem_prealloc*hostSetInfoVecs.nodeLocX.size(),0.0);
+	coordInfoVecs.nodeForceX.resize(2*hostSetInfoVecs.nodeLocX.size());
+	coordInfoVecs.nodeForceY.resize(2*hostSetInfoVecs.nodeLocX.size());
+	coordInfoVecs.nodeForceZ.resize(2*hostSetInfoVecs.nodeLocX.size());
 
-	coordInfoVecs.triangles2Nodes_1.resize( generalParams.mem_prealloc*generalParams.num_of_triangles,INT_MAX);
-	coordInfoVecs.triangles2Nodes_2.resize( generalParams.mem_prealloc*generalParams.num_of_triangles,INT_MAX);
-	coordInfoVecs.triangles2Nodes_3.resize( generalParams.mem_prealloc*generalParams.num_of_triangles,INT_MAX);
+	coordInfoVecs.triangles2Nodes_1.resize( 2*coordInfoVecs.num_triangles );
+	coordInfoVecs.triangles2Nodes_2.resize( 2*coordInfoVecs.num_triangles );
+	coordInfoVecs.triangles2Nodes_3.resize( 2*coordInfoVecs.num_triangles );
 	
-	coordInfoVecs.triangles2Edges_1.resize( generalParams.mem_prealloc*generalParams.num_of_triangles,INT_MAX);
-	coordInfoVecs.triangles2Edges_2.resize( generalParams.mem_prealloc*generalParams.num_of_triangles,INT_MAX);
-	coordInfoVecs.triangles2Edges_3.resize( generalParams.mem_prealloc*generalParams.num_of_triangles,INT_MAX);
+	coordInfoVecs.triangles2Edges_1.resize( 2*coordInfoVecs.num_triangles );
+	coordInfoVecs.triangles2Edges_2.resize( 2*coordInfoVecs.num_triangles );
+	coordInfoVecs.triangles2Edges_3.resize( 2*coordInfoVecs.num_triangles );
 
-	coordInfoVecs.edges2Nodes_1.resize( generalParams.mem_prealloc*generalParams.num_of_edges,INT_MAX );
-	coordInfoVecs.edges2Nodes_2.resize( generalParams.mem_prealloc*generalParams.num_of_edges,INT_MAX );
+	coordInfoVecs.edges2Nodes_1.resize( 2*coordInfoVecs.num_edges );
+	coordInfoVecs.edges2Nodes_2.resize( 2*coordInfoVecs.num_edges );
 	
-	coordInfoVecs.edges2Triangles_1.resize( generalParams.mem_prealloc*generalParams.num_of_edges,INT_MAX );
-	coordInfoVecs.edges2Triangles_2.resize( generalParams.mem_prealloc*generalParams.num_of_edges,INT_MAX );
+	coordInfoVecs.edges2Triangles_1.resize( 2*coordInfoVecs.num_edges );
+	coordInfoVecs.edges2Triangles_2.resize( 2*coordInfoVecs.num_edges );
 
-	coordInfoVecs.nndata1.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata2.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata3.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata4.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata5.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata6.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata7.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata8.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata9.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata10.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata11.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
-	coordInfoVecs.nndata12.resize( generalParams.mem_prealloc*generalParams.num_of_nodes,INT_MAX);
+	coordInfoVecs.nndata1.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata2.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata3.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata4.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata5.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata6.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata7.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata8.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata9.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata10.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata11.resize( 2*generalParams.maxNodeCount);
+	coordInfoVecs.nndata12.resize( 2*generalParams.maxNodeCount);
 
 
 
@@ -1164,7 +1183,7 @@ void System::initializeSystem(HostSetInfoVecs& hostSetInfoVecs) {
 std::cout<<"size of host fixed "<< hostSetInfoVecs.isNodeFixed.size()<<std::endl;
 std::cout<<"size of device fixed "<< coordInfoVecs.isNodeFixed.size()<<std::endl;
 
-	for (int k = 0; k < hostSetInfoVecs.isNodeFixed.size(); k++){
+	/*for (int k = 0; k < coordInfoVecs.isNodeFixed.size(); k++){
 		bool isFixedHost = hostSetInfoVecs.isNodeFixed[k];
 		bool isFixedDevice = coordInfoVecs.isNodeFixed[k];
 		if (isFixedDevice != isFixedHost){
@@ -1172,46 +1191,37 @@ std::cout<<"size of device fixed "<< coordInfoVecs.isNodeFixed.size()<<std::endl
 			std::cout<<"pos "<< k << " dev val = " << coordInfoVecs.isNodeFixed[k]
 				<< " host val = " <<  hostSetInfoVecs.isNodeFixed[k] <<std::endl;
 		}
-	}
+	}*/
 	thrust::fill(coordInfoVecs.nodeForceX.begin(), coordInfoVecs.nodeForceX.end(), 0.0);
 	thrust::fill(coordInfoVecs.nodeForceY.begin(), coordInfoVecs.nodeForceY.end(), 0.0);
 	thrust::fill(coordInfoVecs.nodeForceZ.begin(), coordInfoVecs.nodeForceZ.end(), 0.0);
-//std::cout<<"ERROR HERE 1?"<<std::endl;
+
 	thrust::fill(coordInfoVecs.prevNodeForceX.begin(), coordInfoVecs.prevNodeForceX.end(), 0.0);
 	thrust::fill(coordInfoVecs.prevNodeForceY.begin(), coordInfoVecs.prevNodeForceY.end(), 0.0);
 	thrust::fill(coordInfoVecs.prevNodeForceZ.begin(), coordInfoVecs.prevNodeForceZ.end(), 0.0);
-	//std::cout<<"ERROR HERE 2?"<<std::endl;
+	
 	thrust::copy(hostSetInfoVecs.nodeLocX.begin(), hostSetInfoVecs.nodeLocX.end(), coordInfoVecs.prevNodeLocX.begin() );
 	thrust::copy(hostSetInfoVecs.nodeLocY.begin(), hostSetInfoVecs.nodeLocY.end(), coordInfoVecs.prevNodeLocY.begin() );
 	thrust::copy(hostSetInfoVecs.nodeLocZ.begin(), hostSetInfoVecs.nodeLocZ.end(), coordInfoVecs.prevNodeLocZ.begin() );
-	//std::cout<<"ERROR HERE 3?"<<std::endl;
+	
 	thrust::copy(hostSetInfoVecs.nodeLocX.begin(), hostSetInfoVecs.nodeLocX.end(), coordInfoVecs.nodeLocX.begin() );
 	thrust::copy(hostSetInfoVecs.nodeLocY.begin(), hostSetInfoVecs.nodeLocY.end(), coordInfoVecs.nodeLocY.begin() );
 	thrust::copy(hostSetInfoVecs.nodeLocZ.begin(), hostSetInfoVecs.nodeLocZ.end(), coordInfoVecs.nodeLocZ.begin() );
-	//std::cout<<"ERROR HERE 4?"<<std::endl;
+	
 	thrust::copy(hostSetInfoVecs.triangles2Nodes_1.begin(), hostSetInfoVecs.triangles2Nodes_1.end(), coordInfoVecs.triangles2Nodes_1.begin() );
 	thrust::copy(hostSetInfoVecs.triangles2Nodes_2.begin(), hostSetInfoVecs.triangles2Nodes_2.end(), coordInfoVecs.triangles2Nodes_2.begin() );
 	thrust::copy(hostSetInfoVecs.triangles2Nodes_3.begin(), hostSetInfoVecs.triangles2Nodes_3.end(), coordInfoVecs.triangles2Nodes_3.begin() );
-	/*for (int i = 0; i < coordInfoVecs.triangles2Nodes_1.size(); i++){
-		std::cout<<"triangles2Nodes_1 "<<coordInfoVecs.triangles2Nodes_1[i]<<std::endl;
-	}
-	for (int i = 0; i < coordInfoVecs.triangles2Nodes_2.size(); i++){
-		std::cout<<"triangles2Nodes_2 "<<coordInfoVecs.triangles2Nodes_2[i]<<std::endl;
-	}
-	for (int i = 0; i < coordInfoVecs.triangles2Nodes_3.size(); i++){
-		std::cout<<"triangles2Nodes_3 "<<coordInfoVecs.triangles2Nodes_3[i]<<std::endl;
-	}*/
-	//std::cout<<"ERROR HERE 5?"<<std::endl;
+	
 	thrust::copy(hostSetInfoVecs.triangles2Edges_1.begin(), hostSetInfoVecs.triangles2Edges_1.end(), coordInfoVecs.triangles2Edges_1.begin() );
 	thrust::copy(hostSetInfoVecs.triangles2Edges_2.begin(), hostSetInfoVecs.triangles2Edges_2.end(), coordInfoVecs.triangles2Edges_2.begin() );
 	thrust::copy(hostSetInfoVecs.triangles2Edges_3.begin(), hostSetInfoVecs.triangles2Edges_3.end(), coordInfoVecs.triangles2Edges_3.begin() );
-	//std::cout<<"ERROR HERE 6?"<<std::endl;
+
 	thrust::copy(hostSetInfoVecs.edges2Nodes_1.begin(), hostSetInfoVecs.edges2Nodes_1.end(), coordInfoVecs.edges2Nodes_1.begin() );
 	thrust::copy(hostSetInfoVecs.edges2Nodes_2.begin(), hostSetInfoVecs.edges2Nodes_2.end(), coordInfoVecs.edges2Nodes_2.begin() );
-	//std::cout<<"ERROR HERE 7?"<<std::endl;
+	
 	thrust::copy(hostSetInfoVecs.edges2Triangles_1.begin(), hostSetInfoVecs.edges2Triangles_1.end(), coordInfoVecs.edges2Triangles_1.begin() );
 	thrust::copy(hostSetInfoVecs.edges2Triangles_2.begin(), hostSetInfoVecs.edges2Triangles_2.end(), coordInfoVecs.edges2Triangles_2.begin() );
-	//std::cout<<"ERROR HERE 8?"<<std::endl;
+
 	thrust::copy(hostSetInfoVecs.nndata1.begin(), hostSetInfoVecs.nndata1.end(), coordInfoVecs.nndata1.begin() );
 	thrust::copy(hostSetInfoVecs.nndata2.begin(), hostSetInfoVecs.nndata2.end(), coordInfoVecs.nndata2.begin() );
 	thrust::copy(hostSetInfoVecs.nndata3.begin(), hostSetInfoVecs.nndata3.end(), coordInfoVecs.nndata3.begin() );
@@ -1224,7 +1234,7 @@ std::cout<<"size of device fixed "<< coordInfoVecs.isNodeFixed.size()<<std::endl
 	thrust::copy(hostSetInfoVecs.nndata10.begin(), hostSetInfoVecs.nndata10.end(), coordInfoVecs.nndata10.begin() );
 	thrust::copy(hostSetInfoVecs.nndata11.begin(), hostSetInfoVecs.nndata11.end(), coordInfoVecs.nndata11.begin() );
 	thrust::copy(hostSetInfoVecs.nndata12.begin(), hostSetInfoVecs.nndata12.end(), coordInfoVecs.nndata12.begin() );
-	//std::cout<<"ERROR HERE 9?"<<std::endl;
+
 
  
 	//allocate memory for other data structures.   
@@ -1232,54 +1242,43 @@ std::cout<<"size of device fixed "<< coordInfoVecs.isNodeFixed.size()<<std::endl
 	//area triangle info vec
 	//number of area springs is the number of triangles
 	std::cout<<"Mem"<<std::endl;
-	areaTriangleInfoVecs.tempNodeIdUnreduced.resize(generalParams.mem_prealloc*areaTriangleInfoVecs.factor * generalParams.num_of_triangles,INT_MAX);
-	areaTriangleInfoVecs.tempNodeForceXUnreduced.resize(generalParams.mem_prealloc*areaTriangleInfoVecs.factor * generalParams.num_of_triangles, 0.0);
-	areaTriangleInfoVecs.tempNodeForceYUnreduced.resize(generalParams.mem_prealloc*areaTriangleInfoVecs.factor * generalParams.num_of_triangles,0.0);
-	areaTriangleInfoVecs.tempNodeForceZUnreduced.resize(generalParams.mem_prealloc*areaTriangleInfoVecs.factor * generalParams.num_of_triangles, 0.0);
-	/*for (int i = 0; i < areaTriangleInfoVecs.tempNodeIdUnreduced.size(); i++){
-		std::cout<<"tempNodeIdUnreduced"<<areaTriangleInfoVecs.tempNodeIdUnreduced[i]<<std::endl;
-	}
-	for (int i = 0; i < areaTriangleInfoVecs.tempNodeForceXUnreduced.size(); i++){
-		std::cout<<"tempNodeForceXUnreduced"<<areaTriangleInfoVecs.tempNodeForceXUnreduced[i]<<std::endl;
-	}
-	for (int i = 0; i < areaTriangleInfoVecs.tempNodeForceYUnreduced.size(); i++){
-		std::cout<<"tempNodeForceYUnreduced"<<areaTriangleInfoVecs.tempNodeForceYUnreduced[i]<<std::endl;
-	}
-	for (int i = 0; i < areaTriangleInfoVecs.tempNodeForceZUnreduced.size(); i++){
-		std::cout<<"tempNodeForceZUnreduced"<<areaTriangleInfoVecs.tempNodeForceZUnreduced[i]<<std::endl;
-	}*/
+	areaTriangleInfoVecs.tempNodeIdUnreduced.resize(areaTriangleInfoVecs.factor * coordInfoVecs.num_triangles);
+	areaTriangleInfoVecs.tempNodeForceXUnreduced.resize(areaTriangleInfoVecs.factor * coordInfoVecs.num_triangles);
+	areaTriangleInfoVecs.tempNodeForceYUnreduced.resize(areaTriangleInfoVecs.factor * coordInfoVecs.num_triangles);
+	areaTriangleInfoVecs.tempNodeForceZUnreduced.resize(areaTriangleInfoVecs.factor * coordInfoVecs.num_triangles);
 	
-	areaTriangleInfoVecs.tempNodeIdReduced.resize(generalParams.mem_prealloc*areaTriangleInfoVecs.factor * generalParams.num_of_triangles,INT_MAX);
-	areaTriangleInfoVecs.tempNodeForceXReduced.resize(generalParams.mem_prealloc*areaTriangleInfoVecs.factor * generalParams.num_of_triangles, 0.0);
-	areaTriangleInfoVecs.tempNodeForceYReduced.resize(generalParams.mem_prealloc*areaTriangleInfoVecs.factor * generalParams.num_of_triangles, 0.0);
-	areaTriangleInfoVecs.tempNodeForceZReduced.resize(generalParams.mem_prealloc*areaTriangleInfoVecs.factor * generalParams.num_of_triangles, 0.0);
+	areaTriangleInfoVecs.tempNodeIdReduced.resize(areaTriangleInfoVecs.factor * coordInfoVecs.num_triangles);
+	areaTriangleInfoVecs.tempNodeForceXReduced.resize(areaTriangleInfoVecs.factor * coordInfoVecs.num_triangles);
+	areaTriangleInfoVecs.tempNodeForceYReduced.resize(areaTriangleInfoVecs.factor * coordInfoVecs.num_triangles);
+	areaTriangleInfoVecs.tempNodeForceZReduced.resize(areaTriangleInfoVecs.factor * coordInfoVecs.num_triangles);
 
 	//beinding triangle info vec
 	//num bending springs is the number of times each edge is between two triangles. 
-	bendingTriangleInfoVecs.numBendingSprings = coordInfoVecs.edges2Triangles_1.size();
+	bendingTriangleInfoVecs.numBendingSprings = coordInfoVecs.num_edges;//coordInfoVecs.edges2Triangles_1.size();
 
-	bendingTriangleInfoVecs.tempNodeIdUnreduced.resize(generalParams.mem_prealloc*bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings,INT_MAX);
-	bendingTriangleInfoVecs.tempNodeForceXUnreduced.resize(generalParams.mem_prealloc*bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings,0.0);
-	bendingTriangleInfoVecs.tempNodeForceYUnreduced.resize(generalParams.mem_prealloc*bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings,0.0);
-	bendingTriangleInfoVecs.tempNodeForceZUnreduced.resize(generalParams.mem_prealloc*bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings,0.0);
+	bendingTriangleInfoVecs.tempNodeIdUnreduced.resize(bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings);
+	bendingTriangleInfoVecs.tempNodeForceXUnreduced.resize(bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings);
+	bendingTriangleInfoVecs.tempNodeForceYUnreduced.resize(bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings);
+	bendingTriangleInfoVecs.tempNodeForceZUnreduced.resize(bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings);
 	
-	bendingTriangleInfoVecs.tempNodeIdReduced.resize(generalParams.mem_prealloc*bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings,INT_MAX);
-	bendingTriangleInfoVecs.tempNodeForceXReduced.resize(generalParams.mem_prealloc*bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings,0.0);
-	bendingTriangleInfoVecs.tempNodeForceYReduced.resize(generalParams.mem_prealloc*bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings,0.0);
-	bendingTriangleInfoVecs.tempNodeForceZReduced.resize(generalParams.mem_prealloc*bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings,0.0);
+	bendingTriangleInfoVecs.tempNodeIdReduced.resize(bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings);
+	bendingTriangleInfoVecs.tempNodeForceXReduced.resize(bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings);
+	bendingTriangleInfoVecs.tempNodeForceYReduced.resize(bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings);
+	bendingTriangleInfoVecs.tempNodeForceZReduced.resize(bendingTriangleInfoVecs.factor * bendingTriangleInfoVecs.numBendingSprings);
 
 	//linear springs
-	linearSpringInfoVecs.tempNodeIdUnreduced.resize(generalParams.mem_prealloc*linearSpringInfoVecs.factor * generalParams.num_of_edges,INT_MAX);
-	linearSpringInfoVecs.tempNodeForceXUnreduced.resize(generalParams.mem_prealloc*linearSpringInfoVecs.factor * generalParams.num_of_edges,0.0);
-	linearSpringInfoVecs.tempNodeForceYUnreduced.resize(generalParams.mem_prealloc*linearSpringInfoVecs.factor * generalParams.num_of_edges,0.0);
-	linearSpringInfoVecs.tempNodeForceZUnreduced.resize(generalParams.mem_prealloc*linearSpringInfoVecs.factor * generalParams.num_of_edges,0.0);
+	int Ne = linearSpringInfoVecs.factor*coordInfoVecs.num_edges + 1;
+	linearSpringInfoVecs.tempNodeIdUnreduced.resize(Ne);
+	linearSpringInfoVecs.tempNodeForceXUnreduced.resize(Ne);
+	linearSpringInfoVecs.tempNodeForceYUnreduced.resize(Ne);
+	linearSpringInfoVecs.tempNodeForceZUnreduced.resize(Ne);
 	
-	linearSpringInfoVecs.tempNodeIdReduced.resize(generalParams.mem_prealloc*linearSpringInfoVecs.factor * generalParams.num_of_edges,INT_MAX);
-	linearSpringInfoVecs.tempNodeForceXReduced.resize(generalParams.mem_prealloc*linearSpringInfoVecs.factor * generalParams.num_of_edges,0.0);
-	linearSpringInfoVecs.tempNodeForceYReduced.resize(generalParams.mem_prealloc*linearSpringInfoVecs.factor * generalParams.num_of_edges,0.0);
-	linearSpringInfoVecs.tempNodeForceZReduced.resize(generalParams.mem_prealloc*linearSpringInfoVecs.factor * generalParams.num_of_edges,0.0);
+	linearSpringInfoVecs.tempNodeIdReduced.resize(linearSpringInfoVecs.factor * coordInfoVecs.num_edges);
+	linearSpringInfoVecs.tempNodeForceXReduced.resize(linearSpringInfoVecs.factor * coordInfoVecs.num_edges);
+	linearSpringInfoVecs.tempNodeForceYReduced.resize(linearSpringInfoVecs.factor * coordInfoVecs.num_edges);
+	linearSpringInfoVecs.tempNodeForceZReduced.resize(linearSpringInfoVecs.factor * coordInfoVecs.num_edges);
 	
-	linearSpringInfoVecs.edge_initial_length.resize(generalParams.mem_prealloc*generalParams.num_of_edges);
+	linearSpringInfoVecs.edge_initial_length.resize(2*coordInfoVecs.num_edges);
 	
 	thrust::copy(hostSetInfoVecs.edge_initial_length.begin(), hostSetInfoVecs.edge_initial_length.end(), linearSpringInfoVecs.edge_initial_length.begin() );
 	std::cout<<"initial lengths: "<< linearSpringInfoVecs.edge_initial_length.size()<<std::endl;
@@ -1287,10 +1286,10 @@ std::cout<<"size of device fixed "<< coordInfoVecs.isNodeFixed.size()<<std::endl
 	std::cout<<"System Ready"<<std::endl;
 
 	//Generate LJ particle list. and set LJ particle midpoint.
-	//double maxX_lj = *(thrust::max_element(coordInfoVecs.nodeLocX.begin(),coordInfoVecs.nodeLocX.end()));
-	//double minX_lj = *(thrust::min_element(coordInfoVecs.nodeLocX.begin(),coordInfoVecs.nodeLocX.end()));
-	//double maxY_lj = *(thrust::max_element(coordInfoVecs.nodeLocY.begin(),coordInfoVecs.nodeLocY.end()));
-	//double minY_lj = *(thrust::min_element(coordInfoVecs.nodeLocY.begin(),coordInfoVecs.nodeLocY.end()));
+	double maxX_lj = *(thrust::max_element(coordInfoVecs.nodeLocX.begin(),coordInfoVecs.nodeLocX.end()));
+	double minX_lj = *(thrust::min_element(coordInfoVecs.nodeLocX.begin(),coordInfoVecs.nodeLocX.end()));
+	double maxY_lj = *(thrust::max_element(coordInfoVecs.nodeLocY.begin(),coordInfoVecs.nodeLocY.end()));
+	double minY_lj = *(thrust::min_element(coordInfoVecs.nodeLocY.begin(),coordInfoVecs.nodeLocY.end()));
 	
 	//ljInfoVecs.LJ_PosX = (maxX_lj + minX_lj)/2.0;
 	//ljInfoVecs.LJ_PosY = (maxY_lj + minY_lj)/2.0;
@@ -1323,10 +1322,10 @@ std::cout<<"size of device fixed "<< coordInfoVecs.isNodeFixed.size()<<std::endl
 
 
 	//last, set memory foor buckets.
-	auxVecs.id_bucket.resize(generalParams.num_of_nodes);
-	auxVecs.id_value.resize(generalParams.num_of_nodes);
-	auxVecs.id_bucket_expanded.resize(27 * (generalParams.num_of_nodes));
-	auxVecs.id_value_expanded.resize(27 *( generalParams.num_of_nodes ));
+	auxVecs.id_bucket.resize(generalParams.maxNodeCount);
+	auxVecs.id_value.resize(generalParams.maxNodeCount);
+	auxVecs.id_bucket_expanded.resize(27 * (generalParams.maxNodeCount));
+	auxVecs.id_value_expanded.resize(27 *( generalParams.maxNodeCount ));
  
 
 

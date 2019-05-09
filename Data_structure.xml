@@ -3,11 +3,11 @@
 <settings>
 <resistance>3.769911184308</resistance>
 
-<Tau>0.78</Tau>
+<Tau>10.0</Tau>
 <KBT>1.0</KBT>
 <Linear_Const>20.0</Linear_Const>
-<Area_Const>10.0</Area_Const>
-<Bend_Const>10.0</Bend_Const>
+<Area_Const>1.0</Area_Const>
+<Bend_Const>15.0</Bend_Const>
 <LJ_Eps>0.0</LJ_Eps>
 <LJ_Rmin>3.5</LJ_Rmin>
 <LJ_Rmax>3.90512484</LJ_Rmax>

@@ -18,7 +18,7 @@
 Edgeswap::Edgeswap(CoordInfoVecs& coordInfoVecs,
 GeneralParams& generalParams) {
             
-    int nnode = generalParams.num_of_nodes;
+    int nnode = generalParams.maxNodeCount;
     std::vector<bool> boundary_node_temp(nnode,false);
     for (int i = 0; i < nnode; i++){
         if (coordInfoVecs.edges2Triangles_1[i] == coordInfoVecs.edges2Triangles_2[i]){

@@ -17,10 +17,9 @@ Storage::Storage(
 	
 	if (SYSTEM) {
 		
-	 	//statesOutput << "node_count " << SYSTEM->coordInfoVecs.nodeLocX.size() << '\n';
-		 statesOutput << "node_count " << SYSTEM->generalParams.num_of_nodes << '\n';
-	 	statesOutput << "edge_count " << SYSTEM->generalParams.num_of_edges << '\n';
-	 	statesOutput << "elem_count " << SYSTEM->generalParams.num_of_triangles << '\n';
+	 	statesOutput << "node_count " << SYSTEM->coordInfoVecs.nodeLocX.size() << '\n';
+	 	statesOutput << "edge_count " << SYSTEM->coordInfoVecs.num_edges << '\n';
+	 	statesOutput << "elem_count " << SYSTEM->coordInfoVecs.num_triangles << '\n';
 	}
 
 
@@ -44,8 +43,8 @@ void Storage::print_VTK_File(void) {
 		//std::string initial = "Animation_realistic_kT1d0/atp1_kT1d0_ks7d2_kb15_adh3d75_dt0d0002_";
 		//std::string initial = "Animation_5nm/atp1_kT2d5_ks28d8_kb15_ka720_adh15_dt0d0002_";
 		//std::string initial = "Animation_realistic_finaltry/wrap_v0d0001_dt0d0001_newrange_";
-		std::string initial = "Animation_realistic/edgeswaptest_small_growth4_";//volumetest40_n2d0lowhem10_ka0_eqvol1d5_";//spheretest_rad0d17549_lowerhem5_ka5_ks25kb5_LJR2_"; //Anneal_adh15_Rv0d75_MD20a7d5_v0d2_NKBT4000_dt0d0002_";
-		//std::string initial = "Animation_realistic/MDmed_adh15_ks20_kb15_ka40_kv200_v0d0005_dt0d0002_norep_";
+		//std::string initial = "Animation_realistic/membrane_";//volumetest40_n2d0lowhem10_ka0_eqvol1d5_";//spheretest_rad0d17549_lowerhem5_ka5_ks25kb5_LJR2_"; //Anneal_adh15_Rv0d75_MD20a7d5_v0d2_NKBT4000_dt0d0002_";
+		std::string initial = "Animation_realistic/test_";
 		//std::string initial = "Animation_realistic_flow/Pflow0d5_v0d0005_MRT0d005_dt0d0002_";
 		std::ofstream ofs;
 		if (digits == 1 || digits == 0) {
@@ -66,7 +65,7 @@ void Storage::print_VTK_File(void) {
 		ofs.open(Filename.c_str());
 		
 	
-		int numParticles = SYSTEM->generalParams.num_of_nodes;//one for lj particle
+		int numParticles = SYSTEM->generalParams.maxNodeCount;//one for lj particle
 
 		
 		
@@ -106,7 +105,7 @@ void Storage::print_VTK_File(void) {
 			
 		}
 
-		ofs<< 1 << " " << SYSTEM->generalParams.num_of_nodes << std::endl;
+		ofs<< 1 << " " << SYSTEM->generalParams.maxNodeCount << std::endl;
 		
 		ofs << "CELL_TYPES " << numCells << std::endl;  
 		//set edges and last set scattered points(dpd)
@@ -125,9 +124,9 @@ void Storage::print_VTK_File(void) {
 
 			int idA = SYSTEM->coordInfoVecs.edges2Nodes_1[edge];
 			int idB = SYSTEM->coordInfoVecs.edges2Nodes_2[edge];
-			if (idA >= SYSTEM->generalParams.num_of_nodes)
+			if (idA >= SYSTEM->generalParams.maxNodeCount)
 				std::cout<<idA<<std::endl;
-			if (idB >= SYSTEM->generalParams.num_of_nodes)
+			if (idB >= SYSTEM->generalParams.maxNodeCount)
 				std::cout<<idB<<std::endl;
 			double L0 = SYSTEM->generalParams.Rmin;
 			double xL = SYSTEM->coordInfoVecs.nodeLocX[idA];
@@ -149,12 +148,12 @@ void Storage::print_VTK_File(void) {
 	
 	}
 
-	//now print out the file for the capsid
-	/*if ((SYSTEM)) {
+	/*//now print out the file for the capsid
+	if ((SYSTEM)) {
 		unsigned digits = ceil(log10(iteration + 1));
 		std::string format = ".vtk";
 		std::string Number;
-		std::string initial = "Animation_realistic/spheretest_cytoplasm_rad0d17549_lowerhem5_ka5_ks25kb5_LJR2_";
+		std::string initial = "Animation_realistic/nucleus_";
 		std::ofstream ofs;
 		if (digits == 1 || digits == 0) {
 			Number = "0000" + std::to_string(iteration);
@@ -257,40 +256,22 @@ void Storage::storeVariables(void) {
 	if (SYSTEM) {
 
 		//first create a new file using the current network strain
-		iteration2+=1;
-		int digits2 = ceil(log10(iteration2 + 1));
+		
 		std::string format = ".sta";
-		std::string Number2;
-		//std::string lj_z =  std::to_string(SYSTEM->ljInfoVecs.LJ_PosZ);
+		std::string lj_z =  std::to_string(SYSTEM->ljInfoVecs.LJ_PosZ);
 		//std::string initial = "Variables_new/new_MC_interval_";
 		//std::string initial = "Variables_realistic_anneal/attempt1_kT3d0anneal_ks7d2_kb15_adh15_dt0d0002_";
 //		std::string initial = "Variables_QN/ss0d025_kT_0d5_QN_";
 		//std::string initial = "Variables_realistic_kT1d0/atp1_kT1d0_ks7d2_kb15_adh3d75_dt0d0002_";
 		//std::string initial = "Variables_5nm/atp1_kT2d5_ks28d8_kb15_ka720_adh15_dt0d0002_";
 		//std::string initial = "Variables_realistic_finaltry/wrap_v0d0001_dt0d0001_newrange_";
-		std::string initial = "Variables_realistic/edgeswaptest_small_growth4_";//volumetest20_n2d0lowhem10_ka0_eqvol1d5_";//spheretest_rad0d17549_lowerhem5_ka5_ks25kb5_LJR2_"; //Anneal_adh15_Rv0d75_MD20a7d5_v0d2_NKBT4000_dt0d0002_";
-		//std::string initial = "Variables_realistic/MDmed_adh15_ks20_kb15_ka40_kv200_v0d0005_dt0d0002_";
+		//std::string initial = "Variables_realistic/cell_with_mem_and_nuc_";//volumetest20_n2d0lowhem10_ka0_eqvol1d5_";//spheretest_rad0d17549_lowerhem5_ka5_ks25kb5_LJR2_"; //Anneal_adh15_Rv0d75_MD20a7d5_v0d2_NKBT4000_dt0d0002_";
+		std::string initial = "Variables_realistic/test_";
 		//std::string initial = "Variables_realistic_flow/Pflow0d5_v0d001_MaxRunTime0d005_dt0d0002_";
-		//std::ofstream ofs;
-		//std::string Filename = initial + lj_z + format;
-		//ofs.open(Filename.c_str());
 		std::ofstream ofs;
-		if (digits2 == 1 || digits2 == 0) {
-			Number2 = "0000" + std::to_string(iteration2);
-		}
-		else if (digits2 == 2) {
-			Number2 = "000" + std::to_string(iteration2);
-		}
-		else if (digits2 == 3) {
-			Number2 = "00" + std::to_string(iteration2);
-		}
-		else if (digits2 == 4) {
-			Number2 = "0" + std::to_string(iteration2);
-		}
-
-		std::string Filename = initial + Number2 + format;
-
+		std::string Filename = initial + lj_z + format;
 		ofs.open(Filename.c_str());
+
 
 
 
@@ -304,11 +285,11 @@ void Storage::storeVariables(void) {
 								
 								
 		ofs << std::setprecision(5) <<std::fixed<< "total_energy=" << total_energy<<std::endl;
-		
-		/*//ofs << std::setprecision(5) <<std::fixed<< "lj_x_pos=" << SYSTEM->ljInfoVecs.LJ_PosX<<std::endl;
-		//ofs << std::setprecision(5) <<std::fixed<< "lj_y_pos=" << SYSTEM->ljInfoVecs.LJ_PosY<<std::endl;
-		//ofs << std::setprecision(5) <<std::fixed<< "lj_z_pos=" << SYSTEM->ljInfoVecs.LJ_PosZ<<std::endl;
+		for (int i = 0; i < SYSTEM->ljInfoVecs.LJ_PosX_all.size(); i++){
+			ofs << std::setprecision(5) <<std::fixed<< "nucleus " << SYSTEM->ljInfoVecs.LJ_PosX_all[i]<<" "<< SYSTEM->ljInfoVecs.LJ_PosY_all[i]<<" "<< SYSTEM->ljInfoVecs.LJ_PosZ_all[i]<<std::endl;
+		}
 		unsigned numParticles = SYSTEM->generalParams.maxNodeCountLJ;
+		
 		ofs << std::setprecision(5) <<std::fixed<<"number of LJ particles "<<numParticles<<std::endl;
 		
 
@@ -350,13 +331,6 @@ void Storage::storeVariables(void) {
 			ofs << std::setprecision(5) <<std::fixed<< "<edge2elem> " << t2n_1 << " " << t2n_2 <<" </edge2elem>"<<std::endl;
 		
 		}
-
-		for (int i = 0; i < SYSTEM->generalParams.edges_in_upperhem_index.size(); i++) {
-			int t2n_1 = SYSTEM->generalParams.edges_in_upperhem_index[i];
-			//int t2n_2 = SYSTEM->coordInfoVecs.edges2Triangles_2[i];
-			ofs << std::setprecision(5) <<std::fixed<< "<edgesinupperhem> " << t2n_1 <<" </edgesinupperhem>"<<std::endl;
-		
-		}*/
 
 
 

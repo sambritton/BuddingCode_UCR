@@ -29,7 +29,6 @@
 #include <thrust/execution_policy.h>
 #include <thrust/pair.h>
 #include <stdint.h>
-#include <bits/stdc++.h> 
 
 //
 struct CapsidInfoVecs {
@@ -308,7 +307,6 @@ struct GeneralParams{
 	thrust::device_vector<int> edge_to_ljparticle;
 	thrust::device_vector<int> nodes_in_upperhem;
 	thrust::device_vector<int> edges_in_upperhem;
-	thrust::device_vector<int> edges_in_upperhem_index;
 	thrust::device_vector<int> triangles_in_upperhem;
 	double centerX = 0.0;
 	double centerY = 0.0;
@@ -320,13 +318,9 @@ struct GeneralParams{
 	double volume_spring_constant;
 	double volume_energy;
 
-	int num_of_nodes;
 	int num_of_triangles;
 	int num_of_edges;
-	int edgeswap_iteration = 0;
 
-	
-	int mem_prealloc = 1; //This is an integer factor for expansion of the size of vectors.
 };
 
 

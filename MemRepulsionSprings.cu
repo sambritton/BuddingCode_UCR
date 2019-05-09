@@ -36,7 +36,7 @@ void ComputeMemRepulsionSprings(
                 auxVecs.id_bucket.begin(),
                 coordInfoVecs.nodeForceX.begin(),
                 coordInfoVecs.nodeForceY.begin(),
-                coordInfoVecs.nodeForceZ.begin())) + generalParams.num_of_nodes,
+                coordInfoVecs.nodeForceZ.begin())) + generalParams.maxNodeCount,
 
         thrust::make_zip_iterator(
             thrust::make_tuple(
@@ -49,7 +49,7 @@ void ComputeMemRepulsionSprings(
                 generalParams.abs_Rmin,
                 linearSpringInfoVecs.spring_constant_rep1,
                 linearSpringInfoVecs.spring_constant_rep2,
-                generalParams.num_of_nodes,
+                generalParams.maxNodeCount,
                 
                 thrust::raw_pointer_cast(coordInfoVecs.nndata1.data()),
                 thrust::raw_pointer_cast(coordInfoVecs.nndata2.data()),

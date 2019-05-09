@@ -36,7 +36,7 @@ void ComputeVolumeSprings(
                 auxVecs.id_bucket.begin(),
                 coordInfoVecs.nodeForceX.begin(),
                 coordInfoVecs.nodeForceY.begin(),
-                coordInfoVecs.nodeForceZ.begin())) + generalParams.num_of_nodes,
+                coordInfoVecs.nodeForceZ.begin())) + generalParams.maxNodeCount,
 
         thrust::make_zip_iterator(
             thrust::make_tuple(

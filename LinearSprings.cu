@@ -8,7 +8,7 @@ void ComputeLinearSprings(
     CoordInfoVecs& coordInfoVecs,
     LinearSpringInfoVecs& linearSpringInfoVecs,
     LJInfoVecs& ljInfoVecs) {
-        std::cout<<"ERROR 30"<<std::endl;
+
         thrust::fill(linearSpringInfoVecs.tempNodeForceXReduced.begin(),linearSpringInfoVecs.tempNodeForceXReduced.end(),0.0);
         thrust::fill(linearSpringInfoVecs.tempNodeForceYReduced.begin(),linearSpringInfoVecs.tempNodeForceYReduced.end(),0.0);
         thrust::fill(linearSpringInfoVecs.tempNodeForceZReduced.begin(),linearSpringInfoVecs.tempNodeForceZReduced.end(),0.0);
@@ -18,8 +18,7 @@ void ComputeLinearSprings(
     
     
         thrust::counting_iterator<int> edgeIdBegin(0);
-        thrust::counting_iterator<int> edgeIdEnd(generalParams.num_of_edges);
-        std::cout<<"ERROR 31"<<std::endl;
+        thrust::counting_iterator<int> edgeIdEnd(coordInfoVecs.num_edges);
 
     //std::cout<<"pre linear spring: " <<coordInfoVecs.nodeForceX.size()<<std::endl;
    /* int id =ljInfoVecs.node_id_close[0];
@@ -37,10 +36,10 @@ void ComputeLinearSprings(
                 linearSpringInfoVecs.edge_initial_length.begin())),
         thrust::make_zip_iterator( 
             thrust::make_tuple(
-                edgeIdEnd,
-                coordInfoVecs.edges2Nodes_1.end(),
-                coordInfoVecs.edges2Nodes_2.end(), 
-                linearSpringInfoVecs.edge_initial_length.end())),
+                edgeIdBegin,
+                coordInfoVecs.edges2Nodes_1.begin(),
+                coordInfoVecs.edges2Nodes_2.begin(), 
+                linearSpringInfoVecs.edge_initial_length.begin())) + (coordInfoVecs.num_edges),
         LinearSpringFunctor(
             linearSpringInfoVecs.spring_constant, 
             linearSpringInfoVecs.spring_constant_weak,
@@ -54,10 +53,6 @@ void ComputeLinearSprings(
             thrust::raw_pointer_cast(linearSpringInfoVecs.tempNodeForceYUnreduced.data()),
             thrust::raw_pointer_cast(linearSpringInfoVecs.tempNodeForceZUnreduced.data()) ),
         0.0, thrust::plus<double>() ); 
-        std::cout<<"ERROR 32"<<std::endl;
-        //for (int i = 0; i < linearSpringInfoVecs.tempNodeIdUnreduced.size(); i++){
-          //  std::cout<<"tempNodeIdUnreduced"<<linearSpringInfoVecs.tempNodeIdUnreduced[i]<<std::endl;
-        //}
       //std::cout<<"linear energy from spring.cu: "<< linearSpringInfoVecs.linear_spring_energy<<std::endl;
     //now we have un reduced forces. Sort by id and reduce. 
     //key, then value. Each vector returns sorted		
@@ -67,7 +62,7 @@ void ComputeLinearSprings(
                 linearSpringInfoVecs.tempNodeForceXUnreduced.begin(),
                 linearSpringInfoVecs.tempNodeForceYUnreduced.begin(),
                 linearSpringInfoVecs.tempNodeForceZUnreduced.begin())), thrust::less<int>());
-                std::cout<<"ERROR 33"<<std::endl;
+
    /* std::cout<<"mid1 linear spring: " <<coordInfoVecs.nodeForceX.size()<<std::endl;
     std::cout<<"partPos: " << coordInfoVecs.nodeLocX[id]<< " "<< coordInfoVecs.nodeLocY[id] << " "<< coordInfoVecs.nodeLocZ[id] << std::endl;
 	std::cout<<"partForce: " << coordInfoVecs.nodeForceX[id]<< " "<< coordInfoVecs.nodeForceY[id] << " "<< coordInfoVecs.nodeForceZ[id] << std::endl;
@@ -75,7 +70,7 @@ void ComputeLinearSprings(
     int endKey = thrust::get<0>(
         thrust::reduce_by_key(
             linearSpringInfoVecs.tempNodeIdUnreduced.begin(), 
-            linearSpringInfoVecs.tempNodeIdUnreduced.end(),
+            linearSpringInfoVecs.tempNodeIdUnreduced.end() + (2*(coordInfoVecs.num_edges-1)),
         thrust::make_zip_iterator(
             thrust::make_tuple(
                 linearSpringInfoVecs.tempNodeForceXUnreduced.begin(),
@@ -88,7 +83,7 @@ void ComputeLinearSprings(
                 linearSpringInfoVecs.tempNodeForceYReduced.begin(),
                 linearSpringInfoVecs.tempNodeForceZReduced.begin())),
         thrust::equal_to<int>(), CVec3Add())) - linearSpringInfoVecs.tempNodeIdReduced.begin();//binary_pred, binary_op 
-        std::cout<<"ERROR 34"<<std::endl;
+    
 /*
     std::cout<<"mid2 linear spring: " <<coordInfoVecs.nodeForceX.size()<<std::endl;
     std::cout<<"partPos: " << coordInfoVecs.nodeLocX[id]<< " "<< coordInfoVecs.nodeLocY[id] << " "<< coordInfoVecs.nodeLocZ[id] << std::endl;
@@ -117,5 +112,5 @@ void ComputeLinearSprings(
     std::cout<<"partPos: " << coordInfoVecs.nodeLocX[id]<< " "<< coordInfoVecs.nodeLocY[id] << " "<< coordInfoVecs.nodeLocZ[id] << std::endl;
 	std::cout<<"partForce: " << coordInfoVecs.nodeForceX[id]<< " "<< coordInfoVecs.nodeForceY[id] << " "<< coordInfoVecs.nodeForceZ[id] << std::endl;
 	*/
-    std::cout<<"ERROR 35"<<std::endl;
+
 };
