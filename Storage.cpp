@@ -44,7 +44,8 @@ void Storage::print_VTK_File(void) {
 		//std::string initial = "Animation_5nm/atp1_kT2d5_ks28d8_kb15_ka720_adh15_dt0d0002_";
 		//std::string initial = "Animation_realistic_finaltry/wrap_v0d0001_dt0d0001_newrange_";
 		//std::string initial = "Animation_realistic/membrane_";//volumetest40_n2d0lowhem10_ka0_eqvol1d5_";//spheretest_rad0d17549_lowerhem5_ka5_ks25kb5_LJR2_"; //Anneal_adh15_Rv0d75_MD20a7d5_v0d2_NKBT4000_dt0d0002_";
-		std::string initial = "Animation_realistic/test_";
+		//std::string initial = "Animation_realistic/yeastbudding_septinring_test_3particle_";
+		std::string initial = "Animation_realistic2/nucleus_RminNN1d0_tipsupperhem_mem_vol1d5_noise0d01_";//yeastbudding_septin40_test_6particle_1pullonly_";
 		//std::string initial = "Animation_realistic_flow/Pflow0d5_v0d0005_MRT0d005_dt0d0002_";
 		std::ofstream ofs;
 		if (digits == 1 || digits == 0) {
@@ -90,19 +91,21 @@ void Storage::print_VTK_File(void) {
 		
 
 		
-		int numEdges = SYSTEM->generalParams.num_of_edges;//num_edges;
+		int numEdges = SYSTEM->generalParams.true_num_edges;//coordInfoVecs.num_edges;//num_edges;
 		int numCells = numEdges + 1;//one cell for LJ Particle, rest for edges of polymer
 		int numNumsInCells = (3 * numEdges) + (2);//add one for lj and one to list it.
 		
 		
 		ofs << "CELLS " << numCells << " " << numNumsInCells << std::endl;
 		//place edges as cells of type 2. 
-		for (int edge = 0; edge < numEdges; edge++ ){
+		for (int edge = 0; edge < SYSTEM->coordInfoVecs.num_edges; edge++ ){
+			if (SYSTEM->coordInfoVecs.edges2Nodes_1[edge] != INT_MAX || SYSTEM->coordInfoVecs.edges2Nodes_2[edge] != INT_MAX){
 			int idA = SYSTEM->coordInfoVecs.edges2Nodes_1[edge];
 			int idB = SYSTEM->coordInfoVecs.edges2Nodes_2[edge];
+			
 
 			ofs<< 2 << " " << idA << " " << idB << std::endl;
-			
+			}
 		}
 
 		ofs<< 1 << " " << SYSTEM->generalParams.maxNodeCount << std::endl;
@@ -120,14 +123,17 @@ void Storage::print_VTK_File(void) {
 		ofs << "SCALARS Strain double " << std::endl;
 		ofs << "LOOKUP_TABLE default "  << std::endl;
 		//set strain for each edge
-		for (int edge = 0; edge < numEdges; edge++ ){
+		for (int edge = 0; edge < SYSTEM->coordInfoVecs.num_edges; edge++ ){
 
 			int idA = SYSTEM->coordInfoVecs.edges2Nodes_1[edge];
 			int idB = SYSTEM->coordInfoVecs.edges2Nodes_2[edge];
-			if (idA >= SYSTEM->generalParams.maxNodeCount)
-				std::cout<<idA<<std::endl;
-			if (idB >= SYSTEM->generalParams.maxNodeCount)
-				std::cout<<idB<<std::endl;
+			//if (idA >= SYSTEM->generalParams.maxNodeCount && idA != INT_MAX)
+			//	std::cout<<idA<<std::endl;
+			//if (idB >= SYSTEM->generalParams.maxNodeCount && idB != INT_MAX)
+			//	std::cout<<idB<<std::endl;
+			if (idA == INT_MAX && idB == INT_MAX){
+				continue;
+			}
 			double L0 = SYSTEM->generalParams.Rmin;
 			double xL = SYSTEM->coordInfoVecs.nodeLocX[idA];
 			double yL = SYSTEM->coordInfoVecs.nodeLocY[idA];
@@ -148,12 +154,13 @@ void Storage::print_VTK_File(void) {
 	
 	}
 
-	/*//now print out the file for the capsid
+	//now print out the file for the capsid
 	if ((SYSTEM)) {
 		unsigned digits = ceil(log10(iteration + 1));
 		std::string format = ".vtk";
 		std::string Number;
-		std::string initial = "Animation_realistic/nucleus_";
+		//std::string initial = "Animation_realistic/yeastbudding_septinring_nucleus_test_3particle_";
+		std::string initial = "Animation_realistic2/nucleus_RminNN1d0_tipsupperhem_particles_vol1d5_noise0d01_";//yeastbudding_septin40_nucleus_test_6particle_1pullonly_";
 		std::ofstream ofs;
 		if (digits == 1 || digits == 0) {
 			Number = "0000" + std::to_string(iteration);
@@ -248,7 +255,7 @@ void Storage::print_VTK_File(void) {
 			ofs<< 3 <<std::endl;
 		}
 		ofs.close();
-	}*/
+	}
 };
 
 void Storage::storeVariables(void) {
@@ -310,7 +317,7 @@ void Storage::storeVariables(void) {
 		
 		}
 
-		for (int i = 0; i < SYSTEM->coordInfoVecs.triangles2Nodes_1.size(); i++) {
+		/*for (int i = 0; i < SYSTEM->coordInfoVecs.triangles2Nodes_1.size(); i++) {
 			int t2n_1 = SYSTEM->coordInfoVecs.triangles2Edges_1[i];
 			int t2n_2 = SYSTEM->coordInfoVecs.triangles2Edges_2[i];
 			int t2n_3 = SYSTEM->coordInfoVecs.triangles2Edges_3[i];
@@ -330,11 +337,11 @@ void Storage::storeVariables(void) {
 			int t2n_2 = SYSTEM->coordInfoVecs.edges2Triangles_2[i];
 			ofs << std::setprecision(5) <<std::fixed<< "<edge2elem> " << t2n_1 << " " << t2n_2 <<" </edge2elem>"<<std::endl;
 		
-		}
+		}*/
 
 
 
-		/*for (int i = 0; i < SYSTEM->coordInfoVecs.nndata1.size(); i++) {
+		for (int i = 0; i < SYSTEM->coordInfoVecs.nndata1.size(); i++) {
 			int nn1 = SYSTEM->coordInfoVecs.nndata1[i];
 			int nn2 = SYSTEM->coordInfoVecs.nndata2[i];
 			int nn3 = SYSTEM->coordInfoVecs.nndata3[i];
@@ -349,7 +356,7 @@ void Storage::storeVariables(void) {
 			int nn12 = SYSTEM->coordInfoVecs.nndata12[i];
 			ofs << std::setprecision(5) <<std::fixed<< " " << nn1 << " " << nn2 <<" "<< nn3 <<" "<< nn4 <<" "<< nn5 <<" "<< nn6 <<" "<< nn7 <<" "<< nn8 <<" "<< nn9 <<" "<< nn10 <<" "<< nn11 <<" "<< nn12 <<" "<<std::endl;
 		
-		}*/
+		}
 
 	}
 }

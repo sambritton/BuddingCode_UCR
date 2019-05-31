@@ -11,8 +11,8 @@ current_dir := $(shell pwd)
 LIBS:=  -lpugixml -L/$(current_dir)/pugixml/lib64
 #-lgsl -lgslcblas
 
-ILIBS_cuda8 = -I/opt/linux/centos/7.x/x86_64/pkgs/cuda/8.0/include/
-ILIBS_cuda9 := -I/opt/linux/centos/7.x/x86_64/pkgs/cuda/9.1/include/
+ILIBSCPP := -I/afs/crc.nd.edu/x86_64_linux/c/cuda/8.0/include/
+ILIBS1 := -I/afs/crc.nd.edu/x86_64_linux/c/cuda/9.2/include/
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
@@ -24,7 +24,6 @@ CPP_SRCS += \
 ../LJSprings_LJ.cu \
 ../VolumeComp.cu \
 ../VolumeSprings.cu \
-../LineTensionSprings.cu \
 ../NodeAdvance.cu \
 ../AreaTrianglesEnergy.cu \
 ../BendingTrianglesEnergy.cu \
@@ -47,7 +46,6 @@ OBJS += \
 ./LJSprings_LJ.o \
 ./VolumeComp.o \
 ./VolumeSprings.o \
-./LineTensionSprings.o \
 ./NodeAdvance.o \
 ./AreaTrianglesEnergy.o \
 ./BendingTrianglesEnergy.o \
@@ -69,7 +67,6 @@ CPP_DEPS += \
 ./LJSPrings_LJ.d \
 ./VolumeComp.d \
 ./VolumeSprings.d \
-./LineTensionSprings.d \
 ./NodeAdvance.d \
 ./AreaTrianglesEnergy.d \
 ./BendingTrianglesEnergy.d \
@@ -84,9 +81,9 @@ CPP_DEPS += \
 #need o have ILIBS2
 #cpp files
 %.o : ./%.cpp 
-	 $(CXX) $(CFLAGS) $(ILIBS_cuda8) $(LIBS) -o $@ -c $^ 
+	 $(CXX) $(CFLAGS) $(ILIBSCPP) $(LIBS) -o $@ -c $^ 
 
 	
 #cuda files
 %.o : ./%.cu 
-	$(NVCC) $(NVCCFLAGS) $(ILIBS_cuda9) -dc -o $@ $^
+	$(NVCC) $(NVCCFLAGS) $(ILIBS1) -dc -o $@ $^
