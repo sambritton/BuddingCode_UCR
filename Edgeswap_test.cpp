@@ -205,10 +205,10 @@ GeneralParams& generalParams) {
 //                     vec2y = coordInfoVecs.nodeLocY[Tri1_n3] - coordInfoVecs.nodeLocY[Tri1_n1];
 //                     vec2z = coordInfoVecs.nodeLocZ[Tri1_n3] - coordInfoVecs.nodeLocZ[Tri1_n1];
 //                     std::vector<double> N1(3);
-//                     N1[0] = vec1y*vec2z - vec2y*vec1z;
-//                     N1[1] = -(vec1x*vec2z - vec2x*vec1z);
-//                     N1[2] = vec1x*vec2y - vec2x*vec1y;
-//                     double nN1 = sqrt(pow(N1[0],2)+pow(N1[1],2)+pow(N1[2],2));
+//                     N1_x = vec1y*vec2z - vec2y*vec1z;
+//                     N1_y = -(vec1x*vec2z - vec2x*vec1z);
+//                     N1_z = vec1x*vec2y - vec2x*vec1y;
+//                     double nN1 = sqrt(pow(N1_x,2)+pow(N1_y,2)+pow(N1_z,2));
 // 					//std::cout<<"nN1 = "<<nN1<<std::endl;
 
 //                     int Tri2_n1 = coordInfoVecs.triangles2Nodes_1[Tri2];
@@ -226,13 +226,13 @@ GeneralParams& generalParams) {
 //                     vec2y = coordInfoVecs.nodeLocY[Tri2_n3] - coordInfoVecs.nodeLocY[Tri2_n1];
 //                     vec2z = coordInfoVecs.nodeLocZ[Tri2_n3] - coordInfoVecs.nodeLocZ[Tri2_n1];
 //                     std::vector<double> N2(3);
-//                     N2[0] = vec1y*vec2z - vec2y*vec1z;
-//                     N2[1] = -(vec1x*vec2z - vec2x*vec1z);
-//                     N2[2] = vec1x*vec2y - vec2x*vec1y; 
-//                     double nN2 = sqrt(pow(N2[0],2)+pow(N2[1],2)+pow(N2[2],2));;
+//                     N2_x = vec1y*vec2z - vec2y*vec1z;
+//                     N2_y = -(vec1x*vec2z - vec2x*vec1z);
+//                     N2_z = vec1x*vec2y - vec2x*vec1y; 
+//                     double nN2 = sqrt(pow(N2_x,2)+pow(N2_y,2)+pow(N2_z,2));;
 // 					//std::cout<<"nN2 = "<<nN2<<std::endl;
 
-//                     double cosAngle = (N1[0]*N2[0] + N1[1]*N2[1] + N1[2]*N2[2])/(nN1*nN2);
+//                     double cosAngle = (N1_x*N2_x + N1_y*N2_y + N1_z*N2_z)/(nN1*nN2);
 // 					//std::cout<<"dotproduct = "<<cosAngle<<std::endl;
                    
     
@@ -256,12 +256,12 @@ GeneralParams& generalParams) {
 // 					std::cout<<"unit normal 2 = "<<N2[COUNT]<<std::endl;}
 // 					std::cout<<"angle "<<theta_current<<std::endl;*/
 //                     if (j == 0){
-//                         N1x_vol = N1[0]/nN1;
-//                         N1y_vol = N1[1]/nN1;
-//                         N1z_vol = N1[2]/nN1;
-//                         N2x_vol = N2[0]/nN2;
-//                         N2y_vol = N2[1]/nN2;
-//                         N2z_vol = N2[2]/nN2;
+//                         N1x_vol = N1_x/nN1;
+//                         N1y_vol = N1_y/nN1;
+//                         N1z_vol = N1_z/nN1;
+//                         N2x_vol = N2_x/nN2;
+//                         N2y_vol = N2_y/nN2;
+//                         N2z_vol = N2_z/nN2;
 //                     }
 //                 }
 //             }
@@ -764,30 +764,30 @@ GeneralParams& generalParams) {
 //                         N2_vec2z = T2t2_vec2z;
 //                     }                        
 //                     std::vector<double> N1(3);
-//                     N1[0] = N1_vec1y*N1_vec2z - N1_vec2y*N1_vec1z;
-//                     N1[1] = -(N1_vec1x*N1_vec2z - N1_vec2x*N1_vec1z);
-//                     N1[2] = N1_vec1x*N1_vec2y - N1_vec2x*N1_vec1y;
-//                     double nN1 = sqrt(pow(N1[0],2)+pow(N1[1],2)+pow(N1[2],2));
+//                     N1_x = N1_vec1y*N1_vec2z - N1_vec2y*N1_vec1z;
+//                     N1_y = -(N1_vec1x*N1_vec2z - N1_vec2x*N1_vec1z);
+//                     N1_z = N1_vec1x*N1_vec2y - N1_vec2x*N1_vec1y;
+//                     double nN1 = sqrt(pow(N1_x,2)+pow(N1_y,2)+pow(N1_z,2));
 // 					//std::cout<<"newnN1 = "<<nN1<<std::endl;
 
     
 //                     std::vector<double> N2(3);
-//                     N2[0] = N2_vec1y*N2_vec2z - N2_vec2y*N2_vec1z;
-//                     N2[1] = -(N2_vec1x*N2_vec2z - N2_vec2x*N2_vec1z);
-//                     N2[2] = N2_vec1x*N2_vec2y - N2_vec2x*N2_vec1y; 
-//                     double nN2 = sqrt(pow(N2[0],2)+pow(N2[1],2)+pow(N2[2],2));;
+//                     N2_x = N2_vec1y*N2_vec2z - N2_vec2y*N2_vec1z;
+//                     N2_y = -(N2_vec1x*N2_vec2z - N2_vec2x*N2_vec1z);
+//                     N2_z = N2_vec1x*N2_vec2y - N2_vec2x*N2_vec1y; 
+//                     double nN2 = sqrt(pow(N2_x,2)+pow(N2_y,2)+pow(N2_z,2));;
 // 					//std::cout<<"newnN2 = "<<nN2<<std::endl;
 
 //                     if (j == 0){
-//                         N1x_vol = N1[0]/nN1;
-//                         N1y_vol = N1[1]/nN1;
-//                         N1z_vol = N1[2]/nN1;
-//                         N2x_vol = N2[0]/nN2;
-//                         N2y_vol = N2[1]/nN2;
-//                         N2z_vol = N2[2]/nN2;
+//                         N1x_vol = N1_x/nN1;
+//                         N1y_vol = N1_y/nN1;
+//                         N1z_vol = N1_z/nN1;
+//                         N2x_vol = N2_x/nN2;
+//                         N2y_vol = N2_y/nN2;
+//                         N2z_vol = N2_z/nN2;
 //                     }
 
-//                     double cosAngle = (N1[0]*N2[0] + N1[1]*N2[1] + N1[2]*N2[2])/(nN1*nN2);
+//                     double cosAngle = (N1_x*N2_x + N1_y*N2_y + N1_z*N2_z)/(nN1*nN2);
 // 					//std::cout<<"cosAngle = "<<cosAngle<<std::endl;
                     
 //                     if (cosAngle > 1.0) {
@@ -1250,103 +1250,52 @@ int Edgeswap::edge_swap_host_vecs(
         else if (CANDIDATE2_3 != edge_start && CANDIDATE2_3 != edge_end){TAIL = CANDIDATE2_3;}
         else {std::cout<<"tail not set" <<std::endl;}
 
-        /*int safe_flip1 = 0;
-        int safe_flip2 = 0;
-        if (hostSetInfoVecs.nndata1[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata2[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata3[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata4[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata5[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata6[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata7[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata8[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata9[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata10[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata11[TAIL] >= 0){safe_flip1 += 1;        }
-        if (hostSetInfoVecs.nndata12[TAIL] >= 0){safe_flip1 += 1;        }
-
-        if (hostSetInfoVecs.nndata1[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata2[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata3[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata4[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata5[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata6[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata7[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata8[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata9[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata10[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata11[HEAD] >= 0){safe_flip2 += 1;        }
-        if (hostSetInfoVecs.nndata12[HEAD] >= 0){safe_flip2 += 1;        }
-        std::cout<<"safe_flips"<<" "<<safe_flip1<<" "<<safe_flip2<<std::endl;*/
-
         bool BAD_CHOICE = false;
-        int safe_swap1 = 0;
-        int safe_swap2 = 0;
-        int safe_swap3 = 0;
-        int safe_swap4 = 0;
-        if (hostSetInfoVecs. nndata1[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata2[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata3[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata4[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata5[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata6[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata7[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata8[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata9[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata10[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata11[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata12[edge_start] >= 0){safe_swap1 += 1;        }
-        if (hostSetInfoVecs. nndata1[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata2[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata3[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata4[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata5[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata6[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata7[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata8[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata9[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata10[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata11[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata12[edge_end] >= 0){safe_swap2 += 1;        }
-        if (hostSetInfoVecs. nndata1[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata2[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata3[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata4[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata5[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata6[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata7[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata8[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata9[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata10[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata11[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata12[HEAD] >= 0){safe_swap3 += 1;        }
-        if (hostSetInfoVecs. nndata1[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata2[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata3[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata4[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata5[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata6[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata7[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata8[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata9[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata10[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata11[TAIL] >= 0){safe_swap4 += 1;        }
-        if (hostSetInfoVecs. nndata12[TAIL] >= 0){safe_swap4 += 1;        }
-        
-        if (safe_swap1 == 4){
-            BAD_CHOICE = true;
+        for (int q = 0; q < 4; q++){
+            double qq;
+            if (q == 0){
+                qq = edge_start;
+            }
+            else if (q == 1){
+                qq = edge_end;
+            }
+            else if (q == 2){
+                qq = HEAD;
+            }
+            else if (q == 3){
+                qq = TAIL;
+            }
+            int safe_flip1 = 0;
+            if (hostSetInfoVecs.nndata1[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata2[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata3[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata4[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata5[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata6[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata7[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata8[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata9[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata10[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata11[qq] >= 0){safe_flip1 += 1;        }
+            if (hostSetInfoVecs.nndata12[qq] >= 0){safe_flip1 += 1;        }
+
+            if (q == 0 && safe_flip1 == 4){
+                BAD_CHOICE = true;
+                break;
+            }
+            else if (q == 1 && safe_flip1 == 4){
+                BAD_CHOICE = true;
+                break;
+            }
+            else if (q == 2 && safe_flip1 == 12){
+                BAD_CHOICE = true;
+                break;
+            }
+            else if (q == 3 && safe_flip1 == 12){
+                BAD_CHOICE = true;
+                break;
+            }
         }
-        else if (safe_swap2 == 4){
-            BAD_CHOICE = true;
-        }
-        else if (safe_swap3 == 12){
-            BAD_CHOICE = true;
-        }
-        else if (safe_swap4 == 12){
-            BAD_CHOICE = true;
-        }
-        //std::cout<<"safe_swaps = "<<safe_swap1<<" "<<safe_swap2<<" "<<safe_swap3<<" "<<safe_swap4<<std::endl;
-        //std::cout<<"BAD_CHOICE = "<<BAD_CHOICE<<std::endl;
 
         if (BAD_CHOICE == false){//(safe_flip1 < generalParams.safeguardthreshold && safe_flip2 < generalParams.safeguardthreshold){
 
@@ -1390,10 +1339,8 @@ int Edgeswap::edge_swap_host_vecs(
             edges_iteration[2] = H2;
             edges_iteration[3] = T1;
             edges_iteration[4] = T2;
-
-                int Tri1, Tri2, theta_current, local_energy;
+            
                 for (int j = 0; j < 5; j++){
-                    //std::cout<<"WHERE IS THE ERROR 0?"<<std::endl;
                     if (generalParams.edges_in_upperhem[edges_iteration[j]] == 1){
                         bend_spring_constant = bendingTriangleInfoVecs.spring_constant_weak;
                     }
@@ -1403,18 +1350,16 @@ int Edgeswap::edge_swap_host_vecs(
                     else{
                         bend_spring_constant = bendingTriangleInfoVecs.spring_constant;
                     }
-                    //std::cout<<"WHERE IS THE ERROR 0.25?"<<std::endl;
-                    Tri1 = hostSetInfoVecs.edges2Triangles_1[edges_iteration[j]];//index of the 1st triangle
-                    Tri2 = hostSetInfoVecs.edges2Triangles_2[edges_iteration[j]];
+                    int Tri1 = hostSetInfoVecs.edges2Triangles_1[edges_iteration[j]];//index of the 1st triangle
+                    int Tri2 = hostSetInfoVecs.edges2Triangles_2[edges_iteration[j]];
                     //int id_k = hostSetInfoVecs.edges2Nodes_1[edges_iteration[j]];
                     //int id_i = hostSetInfoVecs.edges2Nodes_2[edges_iteration[j]];
-                    if (Tri1 == Tri2){
-                        continue;
-                    }
 
-                    double vec1x, vec1y, vec1z, vec2x, vec2y, vec2z;
-                    //std::cout<<"WHERE IS THE ERROR 0.5?"<<std::endl;
-                   // if (Tri1 != Tri2) {
+                    double N1vec1x, N1vec1y, N1vec1z, N1vec2x, N1vec2y, N1vec2z;
+                    double N2vec1x, N2vec1y, N2vec1z, N2vec2x, N2vec2y, N2vec2z;
+                    double N1_x, N1_y, N1_z, N2_x, N2_y, N2_z;
+                    
+                    if (Tri1 != Tri2) {
                         int Tri1_n1 = hostSetInfoVecs.triangles2Nodes_1[Tri1];
                         if (j == 0){
                             P0x_vol1 = hostSetInfoVecs.nodeLocX[Tri1_n1];
@@ -1423,17 +1368,17 @@ int Edgeswap::edge_swap_host_vecs(
                         }
                         int Tri1_n2 = hostSetInfoVecs.triangles2Nodes_2[Tri1];
                         int Tri1_n3 = hostSetInfoVecs.triangles2Nodes_3[Tri1];
-                        vec1x = hostSetInfoVecs.nodeLocX[Tri1_n2] - hostSetInfoVecs.nodeLocX[Tri1_n1];
-                        vec1y = hostSetInfoVecs.nodeLocY[Tri1_n2] - hostSetInfoVecs.nodeLocY[Tri1_n1];
-                        vec1z = hostSetInfoVecs.nodeLocZ[Tri1_n2] - hostSetInfoVecs.nodeLocZ[Tri1_n1];
-                        vec2x = hostSetInfoVecs.nodeLocX[Tri1_n3] - hostSetInfoVecs.nodeLocX[Tri1_n1];
-                        vec2y = hostSetInfoVecs.nodeLocY[Tri1_n3] - hostSetInfoVecs.nodeLocY[Tri1_n1];
-                        vec2z = hostSetInfoVecs.nodeLocZ[Tri1_n3] - hostSetInfoVecs.nodeLocZ[Tri1_n1];
-                        std::vector<double> N1(3);
-                        N1[0] = vec1y*vec2z - vec2y*vec1z;
-                        N1[1] = -(vec1x*vec2z - vec2x*vec1z);
-                        N1[2] = vec1x*vec2y - vec2x*vec1y;
-                        double nN1 = sqrt(pow(N1[0],2)+pow(N1[1],2)+pow(N1[2],2));
+                        N1vec1x = hostSetInfoVecs.nodeLocX[Tri1_n2] - hostSetInfoVecs.nodeLocX[Tri1_n1];
+                        N1vec1y = hostSetInfoVecs.nodeLocY[Tri1_n2] - hostSetInfoVecs.nodeLocY[Tri1_n1];
+                        N1vec1z = hostSetInfoVecs.nodeLocZ[Tri1_n2] - hostSetInfoVecs.nodeLocZ[Tri1_n1];
+                        N1vec2x = hostSetInfoVecs.nodeLocX[Tri1_n3] - hostSetInfoVecs.nodeLocX[Tri1_n1];
+                        N1vec2y = hostSetInfoVecs.nodeLocY[Tri1_n3] - hostSetInfoVecs.nodeLocY[Tri1_n1];
+                        N1vec2z = hostSetInfoVecs.nodeLocZ[Tri1_n3] - hostSetInfoVecs.nodeLocZ[Tri1_n1];
+                        //std::vector<double> N1(3);
+                        N1_x = N1vec1y*N1vec2z - N1vec2y*N1vec1z;
+                        N1_y = -(N1vec1x*N1vec2z - N1vec2x*N1vec1z);
+                        N1_z = N1vec1x*N1vec2y - N1vec2x*N1vec1y;
+                        double nN1 = sqrt(pow(N1_x,2)+pow(N1_y,2)+pow(N1_z,2));
                         //std::cout<<"nN1 = "<<nN1<<std::endl;
 
                         int Tri2_n1 = hostSetInfoVecs.triangles2Nodes_1[Tri2];
@@ -1444,22 +1389,22 @@ int Edgeswap::edge_swap_host_vecs(
                             P0y_vol2 = hostSetInfoVecs.nodeLocY[Tri2_n1];
                             P0z_vol2 = hostSetInfoVecs.nodeLocZ[Tri2_n1];
                         }
-                        vec1x = hostSetInfoVecs.nodeLocX[Tri2_n2] - hostSetInfoVecs.nodeLocX[Tri2_n1];
-                        vec1y = hostSetInfoVecs.nodeLocY[Tri2_n2] - hostSetInfoVecs.nodeLocY[Tri2_n1];
-                        vec1z = hostSetInfoVecs.nodeLocZ[Tri2_n2] - hostSetInfoVecs.nodeLocZ[Tri2_n1];
-                        vec2x = hostSetInfoVecs.nodeLocX[Tri2_n3] - hostSetInfoVecs.nodeLocX[Tri2_n1];
-                        vec2y = hostSetInfoVecs.nodeLocY[Tri2_n3] - hostSetInfoVecs.nodeLocY[Tri2_n1];
-                        vec2z = hostSetInfoVecs.nodeLocZ[Tri2_n3] - hostSetInfoVecs.nodeLocZ[Tri2_n1];
-                        std::vector<double> N2(3);
-                        N2[0] = vec1y*vec2z - vec2y*vec1z;
-                        N2[1] = -(vec1x*vec2z - vec2x*vec1z);
-                        N2[2] = vec1x*vec2y - vec2x*vec1y; 
-                        double nN2 = sqrt(pow(N2[0],2)+pow(N2[1],2)+pow(N2[2],2));;
+                        N2vec1x = hostSetInfoVecs.nodeLocX[Tri2_n2] - hostSetInfoVecs.nodeLocX[Tri2_n1];
+                        N2vec1y = hostSetInfoVecs.nodeLocY[Tri2_n2] - hostSetInfoVecs.nodeLocY[Tri2_n1];
+                        N2vec1z = hostSetInfoVecs.nodeLocZ[Tri2_n2] - hostSetInfoVecs.nodeLocZ[Tri2_n1];
+                        N2vec2x = hostSetInfoVecs.nodeLocX[Tri2_n3] - hostSetInfoVecs.nodeLocX[Tri2_n1];
+                        N2vec2y = hostSetInfoVecs.nodeLocY[Tri2_n3] - hostSetInfoVecs.nodeLocY[Tri2_n1];
+                        N2vec2z = hostSetInfoVecs.nodeLocZ[Tri2_n3] - hostSetInfoVecs.nodeLocZ[Tri2_n1];
+                        //std::vector<double> N2(3);
+                        N2_x = N2vec1y*N2vec2z - N2vec2y*N2vec1z;
+                        N2_y = -(N2vec1x*N2vec2z - N2vec2x*N2vec1z);
+                        N2_z = N2vec1x*N2vec2y - N2vec2x*N2vec1y; 
+                        double nN2 = sqrt(pow(N2_x,2)+pow(N2_y,2)+pow(N2_z,2));;
                         //std::cout<<"nN2 = "<<nN2<<std::endl;
 
-                        double cosAngle = (N1[0]*N2[0] + N1[1]*N2[1] + N1[2]*N2[2])/(nN1*nN2);
+                        double cosAngle = (N1_x*N2_x + N1_y*N2_y + N1_z*N2_z)/(nN1*nN2);
                         //std::cout<<"dotproduct = "<<cosAngle<<std::endl;
-                        //std::cout<<"WHERE IS THE ERROR 0.75?"<<std::endl;
+                    
         
                         if (cosAngle > 1.0) {
                             cosAngle = 1.0;
@@ -1468,10 +1413,10 @@ int Edgeswap::edge_swap_host_vecs(
                             cosAngle = -1.0;
                         }
 
-                        theta_current = acos( cosAngle );
+                        double theta_current = acos( cosAngle );
                         
                         
-                        local_energy = bend_spring_constant * (1 - cos(theta_current - bendingTriangleInfoVecs.initial_angle) );
+                        double local_energy = bend_spring_constant * (1 - cos(theta_current - bendingTriangleInfoVecs.initial_angle) );
                         
                         //bendingTriangleInfoVecs.spring_constant * (1 - cos(theta_current - bendingTriangleInfoVecs.initial_angle) );
                         temp_bend = temp_bend + local_energy;
@@ -1481,19 +1426,17 @@ int Edgeswap::edge_swap_host_vecs(
                         std::cout<<"unit normal 2 = "<<N2[COUNT]<<std::endl;}
                         std::cout<<"angle "<<theta_current<<std::endl;*/
                         if (j == 0){
-                            N1x_vol = N1[0]/nN1;
-                            N1y_vol = N1[1]/nN1;
-                            N1z_vol = N1[2]/nN1;
-                            N2x_vol = N2[0]/nN2;
-                            N2y_vol = N2[1]/nN2;
-                            N2z_vol = N2[2]/nN2;
+                            N1x_vol = N1_x/nN1;
+                            N1y_vol = N1_y/nN1;
+                            N1z_vol = N1_z/nN1;
+                            N2x_vol = N2_x/nN2;
+                            N2y_vol = N2_y/nN2;
+                            N2z_vol = N2_z/nN2;
                         }
-                        
-                    //}
-                    //std::cout<<"WHERE IS THE ERROR 0.875?"<<std::endl;
+                    }
                 }
                 
-            //std::cout<<"WHERE IS THE ERROR 1?"<<std::endl;
+
             double bend_0 = temp_bend;
             //
             double linear_0;
@@ -1595,14 +1538,12 @@ int Edgeswap::edge_swap_host_vecs(
             /*std::cout<<"old linear energy: "<<linear_0<<std::endl;
             std::cout<<"old bend energy: "<<bend_0<<std::endl;
             std::cout<<"old area energy: "<<area_0_energy<<std::endl;
-            std::cout<<"old total energy: "<<E_0<<std::endl;
-            std::cout<<"old volume energy: "<<generalParams.volume_energy<<std::endl;
-            std::cout<<"old vol_H0 & vol_T0 = "<<vol_H0<<" "<<vol_T0<<std::endl;*/
-            //std::cout<<"WHERE IS THE ERROR 2?"<<std::endl;
+            std::cout<<"old total energy: "<<E_0<<std::endl;*/
+
             
             //Flip the edge, build the data structure for the smaller system.
-            
-            /*int temp_edges2Nodes_1 = TAIL;
+            /*bool BAD_CHOICE = false;
+            int temp_edges2Nodes_1 = TAIL;
             int temp_edges2Nodes_2 = HEAD;
 
             int temp_nndata_HEAD = nndata[HEAD] + 1;
@@ -1639,7 +1580,8 @@ int Edgeswap::edge_swap_host_vecs(
                 BAD_CHOICE = false;
             }*/
 
-            
+
+            if (BAD_CHOICE == false) {
                 /*temp_edges2Nodes_1[iedge] = TAIL;
                 temp_edges2Nodes_2[iedge] = HEAD;
                 temp_nndata[HEAD] = temp_nndata[HEAD] + 1;
@@ -1864,10 +1806,10 @@ int Edgeswap::edge_swap_host_vecs(
                                 T2t1_vec2z = hostSetInfoVecs.nodeLocZ[hostSetInfoVecs.triangles2Nodes_3[T2t1]] - hostSetInfoVecs.nodeLocZ[hostSetInfoVecs.triangles2Nodes_1[T2t1]];
                                 //std::cout<<"T2t2 = T0"<<std::endl;
                                 }
-                //std::cout<<"WHERE IS THE ERROR 3?"<<std::endl;
+                
                 //First calculate the linear spring energy due to edge-swap.
             double linear_1;
-            DISTANCE = sqrt(
+            double DISTANCE = sqrt(
             pow(hostSetInfoVecs.nodeLocX[HEAD] - hostSetInfoVecs.nodeLocX[TAIL], 2.0) + 
             pow(hostSetInfoVecs.nodeLocY[HEAD] - hostSetInfoVecs.nodeLocY[TAIL], 2.0) + 
             pow(hostSetInfoVecs.nodeLocZ[HEAD] - hostSetInfoVecs.nodeLocZ[TAIL], 2.0));
@@ -1903,6 +1845,7 @@ int Edgeswap::edge_swap_host_vecs(
 
         
                 double N1_vec1x, N1_vec1y, N1_vec1z, N1_vec2x, N1_vec2y, N1_vec2z, N2_vec1x, N2_vec1y, N2_vec1z, N2_vec2x, N2_vec2y, N2_vec2z;
+                double N1_x, N1_y, N1_z, N2_x, N2_y, N2_z;
                 bool THIS_SHOULD_NOT_HAPPEN = false;
                 for (int j = 0; j < 5; j++){
                     if (generalParams.edges_in_upperhem[edges_iteration[j]] == 1){
@@ -1991,31 +1934,31 @@ int Edgeswap::edge_swap_host_vecs(
                             N2_vec2y = T2t2_vec2y;
                             N2_vec2z = T2t2_vec2z;
                         }                        
-                        std::vector<double> N1(3);
-                        N1[0] = N1_vec1y*N1_vec2z - N1_vec2y*N1_vec1z;
-                        N1[1] = -(N1_vec1x*N1_vec2z - N1_vec2x*N1_vec1z);
-                        N1[2] = N1_vec1x*N1_vec2y - N1_vec2x*N1_vec1y;
-                        double nN1 = sqrt(pow(N1[0],2)+pow(N1[1],2)+pow(N1[2],2));
+                        //std::vector<double> N1(3);
+                        N1_x = N1_vec1y*N1_vec2z - N1_vec2y*N1_vec1z;
+                        N1_y = -(N1_vec1x*N1_vec2z - N1_vec2x*N1_vec1z);
+                        N1_z = N1_vec1x*N1_vec2y - N1_vec2x*N1_vec1y;
+                        double nN1 = sqrt(pow(N1_x,2)+pow(N1_y,2)+pow(N1_z,2));
                         //std::cout<<"newnN1 = "<<nN1<<std::endl;
 
         
-                        std::vector<double> N2(3);
-                        N2[0] = N2_vec1y*N2_vec2z - N2_vec2y*N2_vec1z;
-                        N2[1] = -(N2_vec1x*N2_vec2z - N2_vec2x*N2_vec1z);
-                        N2[2] = N2_vec1x*N2_vec2y - N2_vec2x*N2_vec1y; 
-                        double nN2 = sqrt(pow(N2[0],2)+pow(N2[1],2)+pow(N2[2],2));;
+                        //std::vector<double> N2(3);
+                        N2_x = N2_vec1y*N2_vec2z - N2_vec2y*N2_vec1z;
+                        N2_y = -(N2_vec1x*N2_vec2z - N2_vec2x*N2_vec1z);
+                        N2_z = N2_vec1x*N2_vec2y - N2_vec2x*N2_vec1y; 
+                        double nN2 = sqrt(pow(N2_x,2)+pow(N2_y,2)+pow(N2_z,2));;
                         //std::cout<<"newnN2 = "<<nN2<<std::endl;
 
                         if (j == 0){
-                            N1x_vol = N1[0]/nN1;
-                            N1y_vol = N1[1]/nN1;
-                            N1z_vol = N1[2]/nN1;
-                            N2x_vol = N2[0]/nN2;
-                            N2y_vol = N2[1]/nN2;
-                            N2z_vol = N2[2]/nN2;
+                            N1x_vol = N1_x/nN1;
+                            N1y_vol = N1_y/nN1;
+                            N1z_vol = N1_z/nN1;
+                            N2x_vol = N2_x/nN2;
+                            N2y_vol = N2_y/nN2;
+                            N2z_vol = N2_z/nN2;
                         }
 
-                        double cosAngle = (N1[0]*N2[0] + N1[1]*N2[1] + N1[2]*N2[2])/(nN1*nN2);
+                        double cosAngle = (N1_x*N2_x + N1_y*N2_y + N1_z*N2_z)/(nN1*nN2);
                         //std::cout<<"cosAngle = "<<cosAngle<<std::endl;
                         
                         if (cosAngle > 1.0) {
@@ -2104,9 +2047,7 @@ int Edgeswap::edge_swap_host_vecs(
                 /*std::cout<<"new linear energy = "<<linear_1<<std::endl;
                 std::cout<<"new bend energy = "<<bend_1<<std::endl;
                 std::cout<<"new area energy = "<<area_1_energy<<std::endl;
-                std::cout<<"new total energy: "<<E_1<<std::endl;
-                std::cout<<"new volume energy: "<<new_vol_energy<<std::endl;
-                std::cout<<"new volume of H0 & T0: "<<vol_H0<<" "<<vol_T0<<" "<<std::endl;*/
+                std::cout<<"new total energy: "<<E_1<<std::endl;*/
             
             //Now compute the Boltzmann factor to determine if a swap occurs.
             std::random_device rd;  //Will be used to obtain a seed for the random number engine
@@ -2123,7 +2064,7 @@ int Edgeswap::edge_swap_host_vecs(
             else{
                 prob = -1.0;
             }
-            //std::cout<<"P(swap): "<<prob<<std::endl;
+           // std::cout<<"P(swap): "<<prob<<std::endl;
             
             bool ACCEPT2;
             if (!isnan(prob)){
@@ -2168,7 +2109,7 @@ int Edgeswap::edge_swap_host_vecs(
                 T2t2 = hostSetInfoVecs.edges2Triangles_2[T2];
                 if (T2t1 == T0){hostSetInfoVecs.edges2Triangles_1[T2] = T0;}
                 if (T2t2 == T0){hostSetInfoVecs.edges2Triangles_2[T2] = T0;}
-
+                //std::cout<<"IS THE ERROR HERE 1?"<<std::endl;
                 ////////////////////////////////////////////////////////////////////////////////////
                 ///////////// UPDATING NEIGHBORING NODE INFO ///////////////////////////////////////
                 ////////////////////////////////////////////////////////////////////////////////////
@@ -2274,7 +2215,7 @@ int Edgeswap::edge_swap_host_vecs(
                     hostSetInfoVecs.nndata12[edge_end] = -2;
                 }
                 else {}
-
+//std::cout<<"IS THE ERROR HERE 2?"<<std::endl;
 
             
                 ///////////// ESTABLISHING NEW CONNECTIVITY ////////////////////
@@ -2328,6 +2269,8 @@ int Edgeswap::edge_swap_host_vecs(
                 }
                 else {}
 
+                //std::cout<<"IS THE ERROR HERE 3?"<<std::endl;
+
                 if (hostSetInfoVecs.nndata1[TAIL] < 0){
                 //  data_id = 0;
                     hostSetInfoVecs.nndata1[TAIL] = HEAD;
@@ -2377,15 +2320,16 @@ int Edgeswap::edge_swap_host_vecs(
                     hostSetInfoVecs.nndata12[TAIL] = HEAD;
                 }
                 else {}
+                //std::cout<<"IS THE ERROR HERE 4?"<<std::endl;
 
-                nndata[HEAD] += 1;
-                nndata[TAIL] += 1;
-                nndata[edge_start] -= 1;
-                nndata[edge_end] -= 1;
+                //nndata[HEAD] += 1;
+                //nndata[TAIL] += 1;
+                //nndata[edge_start] -= 1;
+                //nndata[edge_end] -= 1;
                 
         
             }
-        
+        } 
     }
     };  
     return alpha;

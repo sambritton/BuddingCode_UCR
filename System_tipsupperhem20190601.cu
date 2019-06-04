@@ -71,7 +71,7 @@ void System::Solve_Forces(){
 		generalParams,
 		auxVecs);
 
-	/*ComputeVolume(
+	ComputeVolume(
 		generalParams,
 		coordInfoVecs,
 		linearSpringInfoVecs,
@@ -82,7 +82,7 @@ void System::Solve_Forces(){
 		linearSpringInfoVecs, 
 		capsidInfoVecs,
 		generalParams,
-		auxVecs);*/
+		auxVecs);
 
 	ComputeLineTensionSprings(
 		generalParams,
@@ -96,10 +96,10 @@ void System::solveSystem() {
 	int TESTING = 1;
 	double tip_depth = 0.3985;
 	generalParams.safeguardthreshold = 12;
-	//double pull_strength = 1.0;
-	//std::cout<<"pull_strength from spring linking membrane and nucleus = "<<pull_strength<<std::endl;
+	double pull_strength = 2.0;
+	std::cout<<"pull_strength from spring linking membrane and nucleus = "<<pull_strength<<std::endl;
 	int translate_frequency = 10;
-	double beta1 = 2.5;
+	double beta1 = 0.0;
 	double beta2 = 0.0;
 	std::cout<<"manual push speed = "<<beta1<<std::endl;
 	double EXPAN_THRESHOLD = 2.25;
@@ -198,15 +198,9 @@ void System::solveSystem() {
 
 	auto it = remove_if(edgeIndices.begin(), edgeIndices.end(),  [](const int i) {return i < 0; });
 	edgeIndices.erase(it, edgeIndices.end());
-	
-	//std::vector<int> row2 = {35 ,   76 ,   79 ,  111 ,  113 ,  151 ,  153 ,  360 ,  361 ,  362 ,  363 ,  364 ,  365 ,  505 ,  506 ,  515 ,  516 ,  593 ,  632};
+
 	//std::vector<int> nodes_to_center;
-	generalParams.nodes_in_upperhem.resize(generalParams.maxNodeCount,-1);
-	//for (int i = 0; i < row2.size(); i++){
-	//	generalParams.nodes_in_upperhem[row2[i]] = 1;
-		
-	//	std::cout<<"nodes "<<i<<" "<<generalParams.nodes_in_upperhem[i]<<std::endl;		
-	//}
+	generalParams.nodes_in_upperhem.resize(generalParams.maxNodeCount);
 	for (int i = 0; i < generalParams.maxNodeCount; i++){
 		if (coordInfoVecs.nodeLocZ[i] > (generalParams.centerZ + 5.5)){
 			generalParams.nodes_in_upperhem[i] = 1;
@@ -293,9 +287,7 @@ void System::solveSystem() {
 	}
 	generalParams.eq_total_boundary_length = generalParams.boundaries_in_upperhem.size()*generalParams.Rmin;
 	
-	
-	double max_height = coordInfoVecs.nodeLocZ[35];
-	double min_height = coordInfoVecs.nodeLocZ[38];
+
 
 	//std::vector<int> edge_to_ljparticle;
 	//generalParams.edge_to_ljparticle.reserve(coordInfoVecs.num_edges);
@@ -324,13 +316,13 @@ void System::solveSystem() {
 	//std::cout<<"spring_constnat_rep1 = "<<linearSpringInfoVecs.spring_constant_rep1<<std::endl;
 	//std::cout<<"spring_constnat_rep2 = "<<linearSpringInfoVecs.spring_constant_rep2<<std::endl;
 
-	generalParams.volume_spring_constant = 0.0;//1.65;//0.75;
+	generalParams.volume_spring_constant = 1.0;//0.75;
 	std::cout<<"volume spring constant = "<<generalParams.volume_spring_constant<<std::endl;
-	generalParams.line_tension_constant = 500.0;
+	generalParams.line_tension_constant = 80.0;
 	std::cout<<"line tension constant = "<<generalParams.line_tension_constant<<std::endl;
 
 	double scale_linear = 40.0;
-	double scale_bend = 20.0;
+	double scale_bend = 40.0;
 	double scale_area = 40.0;
 	std::cout<<"scaling of different region linear = "<<scale_linear<<std::endl;
 	std::cout<<"scaling of different region bend = "<<scale_bend<<std::endl;
@@ -359,14 +351,14 @@ void System::solveSystem() {
 	generalParams.abs_Rmin = 0.75;//0.586955;
 	ljInfoVecs.Rmin_M = 2.0;
 	ljInfoVecs.Rcutoff_M = 5.9;
-	ljInfoVecs.Rmin_LJ = 3.0;//3.0//1.0;
-	ljInfoVecs.Rcutoff_LJ = 3.0;//3.0;//1.0;
+	ljInfoVecs.Rmin_LJ = 1.0;//3.0//1.0;
+	ljInfoVecs.Rcutoff_LJ = 1.25;//3.0;//1.0;
 	//ljInfoVecs.epsilon_M = 1.0;
 	ljInfoVecs.epsilon_M_att1 = 0.0;//6.0;//16.0;
 	ljInfoVecs.epsilon_M_att2 = 0.0;//1.0;//1.0;
 	std::cout<<"Morse_NM_D_att = "<<ljInfoVecs.epsilon_M_att1<<std::endl;
 	std::cout<<"Morse_NM_a_att = "<<ljInfoVecs.epsilon_M_att2<<std::endl;
-	ljInfoVecs.epsilon_M_rep1 = 10.0;//16.0;
+	ljInfoVecs.epsilon_M_rep1 = 12.5;//16.0;
 	ljInfoVecs.epsilon_M_rep2 = 0.5;//1.0;
 	std::cout<<"Morse_NM_D_rep = "<<ljInfoVecs.epsilon_M_rep1<<std::endl;
 	std::cout<<"Morse_NM_a_rep = "<<ljInfoVecs.epsilon_M_rep2<<std::endl;
@@ -390,11 +382,11 @@ void System::solveSystem() {
 
 	bool runSim = true;
 
-	int GROWTH_TIME = 50;
-	int RECORD_TIME = 100;//round(Max_RunStep/2);
+	int GROWTH_TIME = 1;
+	int RECORD_TIME = 50;//round(Max_RunStep/2);
 	std::cout<<"Record frequency = "<<RECORD_TIME<<std::endl;
 	std::cout<<"Growth frequency = "<<GROWTH_TIME<<std::endl;
-	int NKBT = 40000; //The max number of edge-swap attempt per kBT value
+	int NKBT = 10000; //The max number of edge-swap attempt per kBT value
 	std::cout<<"Number of edge-swap per kBT value = "<<NKBT<<std::endl;
 	double min_kT = 0.21;
 	std::cout<<"min kT for sim. termination = "<<min_kT<<std::endl;
@@ -429,7 +421,7 @@ void System::solveSystem() {
 		ljInfoVecs
 	);
 
-	generalParams.eq_total_volume = generalParams.true_current_total_volume*2.0;//This is for setting different equilibrium volume to mimic growth or shirnkage.
+	generalParams.eq_total_volume = generalParams.true_current_total_volume*1.5;//This is for setting different equilibrium volume to mimic growth or shirnkage.
 	std::cout<<"true_current_total_volume = "<<generalParams.true_current_total_volume<<std::endl;
 	std::cout<<"eq_total_volume = "<<generalParams.eq_total_volume<<std::endl;
 
@@ -484,7 +476,7 @@ void System::solveSystem() {
 						ljInfoVecs.forceY_all[i] +=  ljInfoVecs.forceY;
 						ljInfoVecs.forceZ_all[i] +=  ljInfoVecs.forceZ;	
 						
-						/*for (int w = 0; w < nodes_in_tip.size(); w++){
+						for (int w = 0; w < nodes_in_tip.size(); w++){
 
 							if (nodes_in_tip[i] == 1 && nucleus_in_upperhem[i] == 1){
 								double R = sqrt( 
@@ -505,7 +497,7 @@ void System::solveSystem() {
 								//coordInfoVecs.nodeForceY[35] += forceY;
 								//coordInfoVecs.nodeForceZ[35] += forceZ;
 							}
-						}*/
+						}
 						/*for (int i = 0; i < filament_base.size(); i++){
 							double R = sqrt( 
 								(ljInfoVecs.LJ_PosX - coordInfoVecs.nodeLocX[filament_base[i]]) * (ljInfoVecs.LJ_PosX - coordInfoVecs.nodeLocX[filament_base[i]]) + 
@@ -522,38 +514,26 @@ void System::solveSystem() {
 						
 					}
 
-					/*double beta;
-					bool target_height_reached = false;
-					if (ljInfoVecs.LJ_PosZ_all[0] >= (min_height + 0.875*(max_height - min_height))){
-						target_height_reached = true;
-					}*/
-
-					//std::random_device rand_dev;
-					//std::mt19937 generator_noise(rand_dev());
-					//std::normal_distribution<double> distribution_noise(0.0, 0.01);
-
+					double beta;
 					for (int i = 0; i < ljInfoVecs.LJ_PosX_all.size(); i++){
 						
-						/*if(nucleus_in_upperhem[i] == 1){
+						 if(nucleus_in_upperhem[i] == 1){
 							beta = beta1;
 						}
 						else{
 							beta = beta2;
 						} 
 
-						if (target_height_reached == true){
-							beta = 0.0;
-						}
-						//std::random_device rand_dev;
-						//std::mt19937 generator_noise(rand_dev());
-						//std::normal_distribution<double> distribution_noise(0.0, 0.01);
+						std::random_device rand_dev;
+						std::mt19937 generator_noise(rand_dev());
+						std::normal_distribution<double> distribution_noise(0.0, 0.01);
 						double noise1 = distribution_noise(generator_noise);
 						double noise2 = distribution_noise(generator_noise);
-						double noise3 = distribution_noise(generator_noise);*/
+						double noise3 = distribution_noise(generator_noise);
 
-						ljInfoVecs.LJ_PosX_all[i] = ljInfoVecs.LJ_PosX_all[i] + generalParams.dt * (ljInfoVecs.forceX_all[i]);// + noise1);
-						ljInfoVecs.LJ_PosY_all[i] = ljInfoVecs.LJ_PosY_all[i] + generalParams.dt * (ljInfoVecs.forceY_all[i]);// + noise2);
-						ljInfoVecs.LJ_PosZ_all[i] = ljInfoVecs.LJ_PosZ_all[i] + generalParams.dt * (ljInfoVecs.forceZ_all[i]);// + beta + noise3);
+						ljInfoVecs.LJ_PosX_all[i] = ljInfoVecs.LJ_PosX_all[i] + generalParams.dt * (ljInfoVecs.forceX_all[i] + noise1);
+						ljInfoVecs.LJ_PosY_all[i] = ljInfoVecs.LJ_PosY_all[i] + generalParams.dt * (ljInfoVecs.forceY_all[i] + noise2);
+						ljInfoVecs.LJ_PosZ_all[i] = ljInfoVecs.LJ_PosZ_all[i] + generalParams.dt * (ljInfoVecs.forceZ_all[i] + beta + noise3);
 					
 					}
 
@@ -604,19 +584,6 @@ void System::solveSystem() {
 				
 
 			}
-			
-		   
-		/*	max_height = -10000.0;
-			min_height = 10000.0;
-			for (int k = 0; k < generalParams.maxNodeCount; k++){
-				if (coordInfoVecs. nodeLocZ[k] >= max_height){
-					max_height = coordInfoVecs. nodeLocZ[k];
-				}
-				if (coordInfoVecs.nodeLocZ[k] <= min_height){
-					min_height = coordInfoVecs.nodeLocZ[k];
-				}
-			}*/
-
 		std::cout<<"current time (1st iter before edgeswap): "<< current_time << std::endl;
 		std::cout<<"current total energy (1st iter before edgeswap) = "<<new_total_energy<<std::endl;
 		std::cout<<"true_current_total_volume = "<<generalParams.true_current_total_volume<<std::endl;
@@ -639,7 +606,7 @@ void System::solveSystem() {
 		//double postswap_energy;
 		//double Ediff = 0.0;
 		//initial_kT = generalParams.kT;
-		num_edge_loop = 4;//round(edges_in_upperhem.size()*SAMPLE_SIZE);	
+		num_edge_loop = 5;//round(edges_in_upperhem.size()*SAMPLE_SIZE);	
 		std::cout<<"num_edge_loop = "<<num_edge_loop<<std::endl;
 	
  		while (initial_kT > 0){
@@ -683,7 +650,7 @@ void System::solveSystem() {
  							ljInfoVecs.forceY_all[i] +=  ljInfoVecs.forceY;
 							 ljInfoVecs.forceZ_all[i] +=  ljInfoVecs.forceZ;
 							 
-							 /*for (int w = 0; w < nodes_in_tip.size(); w++){
+							 for (int w = 0; w < nodes_in_tip.size(); w++){
 								if (nodes_in_tip[w] == 1 && nucleus_in_upperhem[i] == 1){
 									double R = sqrt( 
 										(ljInfoVecs.LJ_PosX - coordInfoVecs.nodeLocX[w]) * (ljInfoVecs.LJ_PosX - coordInfoVecs.nodeLocX[w]) + 
@@ -703,7 +670,7 @@ void System::solveSystem() {
 									//coordInfoVecs.nodeForceY[35] += forceY;
 									//coordInfoVecs.nodeForceZ[35] += forceZ;
 								}
-							}*/
+							}
 							/*for (int k = 0; k < filament_base.size(); k++){
 								double R = sqrt( 
 									(ljInfoVecs.LJ_PosX - coordInfoVecs.nodeLocX[filament_base[k]]) * (ljInfoVecs.LJ_PosX - coordInfoVecs.nodeLocX[filament_base[k]]) + 
@@ -724,37 +691,25 @@ void System::solveSystem() {
  						}
 					
  						//now forces are computed, move nodes.
-						/*double beta;
-						bool target_height_reached = false;
-						if (ljInfoVecs.LJ_PosZ_all[0] >= (min_height + 0.75*(max_height - min_height))){
-							target_height_reached = true;
-						}
-
-						std::random_device rand_dev;
-						std::mt19937 generator_noise(rand_dev());
-						std::normal_distribution<double> distribution_noise(0.0, 0.01);*/
+ 						double beta;
 						 for (int i = 0; i < ljInfoVecs.LJ_PosX_all.size(); i++){
 						
-							/*if(nucleus_in_upperhem[i] == 1){
+							if(nucleus_in_upperhem[i] == 1){
 							   beta = beta1;
 						   }
 						   else{
 							   beta = beta2;
 						   } 
-
-						   if (target_height_reached == true){
-							   beta = 0.0;
-						   }
-						   //std::random_device rand_dev;
-						   //std::mt19937 generator_noise(rand_dev());
-						   //std::normal_distribution<double> distribution_noise(0.0, 0.01);
+						   std::random_device rand_dev;
+						   std::mt19937 generator_noise(rand_dev());
+						   std::normal_distribution<double> distribution_noise(0.0, 0.01);
 						   double noise1 = distribution_noise(generator_noise);
 						   double noise2 = distribution_noise(generator_noise);
-						   double noise3 = distribution_noise(generator_noise);*/
+						   double noise3 = distribution_noise(generator_noise);
    
-						   ljInfoVecs.LJ_PosX_all[i] = ljInfoVecs.LJ_PosX_all[i] + generalParams.dt * (ljInfoVecs.forceX_all[i]);// + noise1);
-						   ljInfoVecs.LJ_PosY_all[i] = ljInfoVecs.LJ_PosY_all[i] + generalParams.dt * (ljInfoVecs.forceY_all[i]);// + noise2);
-						   ljInfoVecs.LJ_PosZ_all[i] = ljInfoVecs.LJ_PosZ_all[i] + generalParams.dt * (ljInfoVecs.forceZ_all[i]);// + beta + noise3);
+						   ljInfoVecs.LJ_PosX_all[i] = ljInfoVecs.LJ_PosX_all[i] + generalParams.dt * (ljInfoVecs.forceX_all[i] + noise1);
+						   ljInfoVecs.LJ_PosY_all[i] = ljInfoVecs.LJ_PosY_all[i] + generalParams.dt * (ljInfoVecs.forceY_all[i] + noise2);
+						   ljInfoVecs.LJ_PosZ_all[i] = ljInfoVecs.LJ_PosZ_all[i] + generalParams.dt * (ljInfoVecs.forceZ_all[i] + beta + noise3);
 					   
 					   }
 						 
@@ -846,19 +801,7 @@ void System::solveSystem() {
  						
  					old_total_energy = new_total_energy;
  					current_time+=generalParams.dt;
-					 }
-					 
-					 
-					/*max_height = -10000.0;
-					min_height = 10000.0;
-					for (int k = 0; k < generalParams.maxNodeCount; k++){
-						if (coordInfoVecs. nodeLocZ[k] >= max_height){
-							max_height = coordInfoVecs. nodeLocZ[k];
-						}
-						if (coordInfoVecs.nodeLocZ[k] <= min_height){
-							min_height = coordInfoVecs.nodeLocZ[k];
-						}
-					}*/
+					 }				
 											
 			
  								
@@ -877,23 +820,31 @@ void System::solveSystem() {
  						//storage->storeVariables();
 					 }
 
-								ComputeVolume(
-									generalParams,
-									coordInfoVecs,
-									linearSpringInfoVecs,
-									ljInfoVecs
-								);
-					 if (edgeswap_iteration % GROWTH_TIME == 0 && generalParams.true_current_total_volume <= generalParams.eq_total_volume){
+					
+
+					 edgeswap_iteration += 1;
+					 
+					/*if (edgeswap_iteration % GROWTH_TIME == 0){
+
+						for (int i = 0; i < coordInfoVecs.nodeLocX.size(); i++){
+							generalParams.centerX += coordInfoVecs.nodeLocX[i];
+							generalParams.centerY += coordInfoVecs.nodeLocY[i];
+							generalParams.centerZ += coordInfoVecs.nodeLocZ[i];
+						}
+						generalParams.centerX = generalParams.centerX/coordInfoVecs.nodeLocX.size();
+						generalParams.centerY = generalParams.centerY/coordInfoVecs.nodeLocX.size();
+						generalParams.centerZ = generalParams.centerZ/coordInfoVecs.nodeLocX.size();
+
 						double x,y,z;
 						std::random_device rand_dev0;
 						std::mt19937 generator0(rand_dev0());
-						std::uniform_real_distribution<double> guess(generalParams.centerX, 1.0);
+						std::uniform_real_distribution<double> guess(generalParams.centerX-1.0, generalParams.centerX+1.0);
 						x = 5.0;//guess(generator0);
 						y = 5.0;//guess(generator0);
 						z = 5.0;//guess(generator0);
 						bool goodchoice = false;
 						double GAP;
-						while (sqrt((x - generalParams.centerX)*(x - generalParams.centerX) + (y - generalParams.centerY)*(y -generalParams.centerY) + (z-generalParams.centerZ)*(z-generalParams.centerZ)) > (2.0) && goodchoice == false){
+						while (sqrt(x*x + y*y + z*z) > (2.0) && goodchoice == false){
 							x = guess(generator0);
 							y = guess(generator0);
 							z = guess(generator0);
@@ -904,7 +855,7 @@ void System::solveSystem() {
 								GAP = sqrt((x-ljInfoVecs.LJ_PosX_all[i])*(x-ljInfoVecs.LJ_PosX_all[i]) +
 											(y-ljInfoVecs.LJ_PosY_all[i])*(x-ljInfoVecs.LJ_PosY_all[i]) +
 											(z-ljInfoVecs.LJ_PosZ_all[i])*(x-ljInfoVecs.LJ_PosZ_all[i]));
-								if (GAP < 0.5){
+								if (GAP < 0.65){
 									goodchoice = false;
 									break;
 								}
@@ -918,15 +869,7 @@ void System::solveSystem() {
 						ljInfoVecs.forceY_all.resize(ljInfoVecs.LJ_PosX_all.size());
 						ljInfoVecs.forceZ_all.resize(ljInfoVecs.LJ_PosX_all.size());
 						generalParams.maxNodeCountLJ = ljInfoVecs.LJ_PosX_all.size();
-					}
-					else if(generalParams.true_current_total_volume > generalParams.eq_total_volume){
-						runSim = false;
-						generalParams.kT = -1.0;
-						break;
-
-					}
-
-					 edgeswap_iteration += 1;
+					}*/
  					//std::cout<<"edgeswap_iteration = "<<edgeswap_iteration<<std::endl;
  					if (edgeswap_iteration == NKBT){
  						generalParams.kT = -1.0;//generalParams.kT - 0.072;
@@ -938,15 +881,6 @@ void System::solveSystem() {
 					runSim = false;
 					break;
 					 }
-					 for (int i = 0; i < coordInfoVecs.nodeLocX.size(); i++){
-						generalParams.centerX += coordInfoVecs.nodeLocX[i];
-						generalParams.centerY += coordInfoVecs.nodeLocY[i];
-						generalParams.centerZ += coordInfoVecs.nodeLocZ[i];
-					}
-					generalParams.centerX = generalParams.centerX/coordInfoVecs.nodeLocX.size();
-					generalParams.centerY = generalParams.centerY/coordInfoVecs.nodeLocX.size();
-					generalParams.centerZ = generalParams.centerZ/coordInfoVecs.nodeLocX.size();
-				
 
 //std::cout<<"ERROR BEFORE GROWTH"<<std::endl;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

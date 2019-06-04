@@ -45,7 +45,7 @@ void Storage::print_VTK_File(void) {
 		//std::string initial = "Animation_realistic_finaltry/wrap_v0d0001_dt0d0001_newrange_";
 		//std::string initial = "Animation_realistic/membrane_";//volumetest40_n2d0lowhem10_ka0_eqvol1d5_";//spheretest_rad0d17549_lowerhem5_ka5_ks25kb5_LJR2_"; //Anneal_adh15_Rv0d75_MD20a7d5_v0d2_NKBT4000_dt0d0002_";
 		//std::string initial = "Animation_realistic/yeastbudding_septinring_test_3particle_";
-		std::string initial = "Animation_realistic2/nucleus_RminNN1d0_tipsupperhem_mem_vol1d5_noise0d01_";//yeastbudding_septin40_test_6particle_1pullonly_";
+		std::string initial = "Animation_realistic3/intpres_mem_maxvolumecap_dt0d0005_";//yeastbudding_septin40_test_6particle_1pullonly_";
 		//std::string initial = "Animation_realistic_flow/Pflow0d5_v0d0005_MRT0d005_dt0d0002_";
 		std::ofstream ofs;
 		if (digits == 1 || digits == 0) {
@@ -160,7 +160,7 @@ void Storage::print_VTK_File(void) {
 		std::string format = ".vtk";
 		std::string Number;
 		//std::string initial = "Animation_realistic/yeastbudding_septinring_nucleus_test_3particle_";
-		std::string initial = "Animation_realistic2/nucleus_RminNN1d0_tipsupperhem_particles_vol1d5_noise0d01_";//yeastbudding_septin40_nucleus_test_6particle_1pullonly_";
+		std::string initial = "Animation_realistic3/intpres_particle_maxvolumecap_dt0d0005_";//yeastbudding_septin40_nucleus_test_6particle_1pullonly_";
 		std::ofstream ofs;
 		if (digits == 1 || digits == 0) {
 			Number = "0000" + std::to_string(iteration);
